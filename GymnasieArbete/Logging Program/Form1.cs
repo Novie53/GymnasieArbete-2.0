@@ -12,7 +12,18 @@ namespace Logging_Program
 {
     public partial class Form1 : Form
     {
-        private NotifyIcon notifyIcon1 = new NotifyIcon();
+        /*
+        *Ha Programmet i System Tray
+	        Någon form av timer för att kontinuellt hämta data från internet
+	        Impenter koppling till databas och möjlighet att lagra och hämta information
+	        Spara Functionerna som skriver till text fil som backup
+	        Konventerar över allt från Text filer till databasen
+	        Fixa så att alla krashar lagras på ett bra sätt
+	
+        Separat Thread för hämtning så Form Threaded inte fastnar?
+        */
+
+        
 
         public Form1()
         {
@@ -21,6 +32,9 @@ namespace Logging_Program
             notifyIcon1.DoubleClick += notifyIcon1_DoubleClick;
         }
 
+        #region NotificationIcon
+
+        private NotifyIcon notifyIcon1 = new NotifyIcon();
         private void notifyIcon1_DoubleClick(object sender, EventArgs e)
         {
             this.Show();
@@ -42,5 +56,7 @@ namespace Logging_Program
                 notifyIcon1.Visible = false;
             }
         }
+
+        #endregion
     }
 }
