@@ -19,7 +19,6 @@ namespace Logging_Program
             InitializeComponent();
             notifyIcon1.Icon = Icon.ExtractAssociatedIcon(@"C:\Program Files (x86)\Mozilla Firefox\firefox.exe");
             notifyIcon1.DoubleClick += notifyIcon1_DoubleClick;
-            
         }
 
         private void notifyIcon1_DoubleClick(object sender, EventArgs e)
