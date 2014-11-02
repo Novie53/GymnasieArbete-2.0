@@ -55,7 +55,6 @@ namespace Logging_Program
                 notifyIcon1.Text = dateTime.Subtract(DateTime.Now).ToString(@"mm\:ss");
             else if (this.WindowState == FormWindowState.Normal)
                 label1.Text = dateTime.Subtract(DateTime.Now).ToString(@"mm\:ss");
-            //Console.WriteLine(dateTime.CompareTo(DateTime.Now));
         }
 
         #region NotificationIcon
@@ -86,3 +85,102 @@ namespace Logging_Program
         #endregion
     }
 }
+
+
+
+//        public void AddToDataSet(MainLib.UniqueMatch match)
+//        {
+//            DataRow row = dataSet.Tables[0].NewRow();
+//            row[0] = dataSet.Tables[0].Rows.Count;
+//            row[1] = match.MatchID;
+//            row[2] = match.Tournament;
+//            row[3] = match.Opp1;
+//            row[4] = match.Opp2;
+//            row[5] = match.Opp1Procent;
+//            row[6] = match.Opp2Procent;
+//            row[7] = match.Comment;
+//            row[8] = match.MatchCount;
+//            row[9] = match.Winner;
+//            row[10] = match.AmountOfPeopleBetting;
+//            row[11] = match.AmountOfItemsBetted;
+//            row[12] = match.Ago;
+//            row[13] = match.Time;
+//            row[14] = match.TimeWhenDataTaken;
+
+//            dataSet.Tables[0].Rows.Add(row);
+//        }
+//        public void updateDataBase()
+//        {
+//            try
+//            {
+//                objConnect.UpdateDatabase(dataSet);
+//                MessageBox.Show("Database updated");
+//            }
+//            catch (Exception err)
+//            {
+//                MessageBox.Show(err.Message);
+//            }
+//        }
+
+//        private void Form1_Load(object sender, EventArgs e)
+//        {
+//            try
+//            {
+//                objConnect = new ClassLibrary.DataBaseConnection();
+//                conString = Properties.Settings.Default.DataBaseConnectionString;
+//                objConnect.ConnectionString = conString;
+//                objConnect.Sql = @"SELECT * FROM MatchesTable";
+//                dataSet = objConnect.GetConnection;
+//            }
+//            catch (Exception err)
+//            {
+//                MessageBox.Show(err.Message);
+//            }
+//            dataGridView1.DataSource = dataSet.Tables[0];
+//        }
+//        private void buttonGatherData_Click(object sender, EventArgs e)
+//        {
+//            List<MainLib.UniqueMatch> list = MainLib.GatherData.grabInfoFromWeb(@"http://dota2lounge.com");
+//            foreach (var item in list)
+//            {
+//                AddToDataSet(item);
+//            }
+//            updateDataBase();
+//            dataGridView1.DataSource = dataSet.Tables[0];
+//            //list = MainLib.GatherData.grabInfoFromWeb(@"http://csgolounge.com");
+//            //foreach (var item in list)
+//            //    item.saveToLoc(@"D:\CsData\");
+//        }
+//        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+//        {
+//            dataSet.Dispose();
+//            objConnect.Dispose();
+//        }
+//    }
+//}
+
+
+//namespace Learn_About_DATABASES
+//{
+//    public partial class Form1 : Form
+//    {
+//        readonly string databasePATH = @"C:\Users\Novie\Desktop\sqlite\test.db";
+//        Herp herp;
+
+//        public Form1()
+//        {
+//            InitializeComponent();
+//            herp = new Herp(@"Data Source=" + databasePATH + @";Version=3;");
+//        }
+
+//        private void Form1_Load(object sender, EventArgs e)
+//        {
+//            dataGridView1.DataSource = herp.ExecuteQuery("SELECT * FROM test");
+//        }
+
+//        private void button1_Click(object sender, EventArgs e)
+//        {
+//            herp.ListTables();
+//        }
+//    }
+//}
