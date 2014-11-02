@@ -24,7 +24,10 @@ namespace Logging_Program
             this.conString = conString;
         }
 
-
+        public int getTableCount(string tableName)
+        {
+            return int.Parse(ExecuteQuery(@"SELECT COUNT(*) FROM " + tableName).Rows[0].ItemArray[0].ToString());
+        }
         public List<string> ListTables()
         {
             List<string> tables = new List<string>();

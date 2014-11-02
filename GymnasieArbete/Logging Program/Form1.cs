@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -13,8 +14,9 @@ namespace Logging_Program
     public partial class Form1 : Form
     {
         private readonly int minTime = 2, maxTime = 5;
-        private readonly string databasePATH = @"C:\Users\Novie\Desktop\sqlite\test.db";
+        private readonly string databasePATH = @"C:\Users\Novie\Desktop\GymnaArbete\mainDatabase.db";
         private DatabaseConncter dbConnector;
+        private int dotaMatchesCount = 0;
 
         /*
         *Ha Programmet i System Tray
@@ -39,9 +41,62 @@ namespace Logging_Program
             timer.Start();
 
             dbConnector = new DatabaseConncter(@"Data Source=" + databasePATH + @";Version=3;");
+            dotaMatchesCount = dbConnector.getTableCount("dota_matches");
 
             notifyIcon1.Icon = Icon.ExtractAssociatedIcon(@"C:\Program Files (x86)\Mozilla Firefox\firefox.exe");
             notifyIcon1.DoubleClick += notifyIcon1_DoubleClick;
+
+            List<MainLib.UniqueMatch> list = MainLib.GatherData.grabInfoFromWeb(@"http://dota2lounge.com");
+            foreach (var item in list)
+            {
+                item.SaveToLoc(@"D:\DotaData\");
+                InsertToDatabase("dota_matches", new Dictionary<string, string>()
+                    {
+                        {"id",dotaMatchesCount.ToString()},
+                        {"match_id",item.MatchID.ToString()},
+                        //{"tournament","'" + item.Tournament + "'"},
+                        //{"opponent1","'" + item.Opp1 + "'"},
+                        //{"opponent2","'" + item.Opp2 + "'"},
+                        //{"opponent1_procent",item.Opp1Procent.ToString()},
+                        //{"opponent2_procent",item.Opp2Procent.ToString()},
+                        //{"comment","'" + item.Comment + "'"},
+                        //{"match_count",item.MatchCount.ToString()},
+                        //{"winner",item.Winner.ToString()},
+                        //{"people_betting",item.AmountOfPeopleBetting.ToString()},
+                        //{"items_betting",item.AmountOfItemsBetted.ToString()},
+                        //{"ago","'" + item.Ago + "'"},
+                        //{"time","'" + item.Time + "'"},
+                        //{"when_taken",DateTimeToUnixTimestamp(item.TimeWhenDataTaken).ToString()}
+                    });
+                dotaMatchesCount++;
+            }
+        }
+
+        private int DateTimeToUnixTimestamp(DateTime dateTime)
+        {
+            return (int)(dateTime - new DateTime(1970, 1, 1).ToLocalTime()).TotalSeconds;
+        }
+        private void InsertToDatabase(string tableName, Dictionary<string,string> data)
+        {
+            string var1 = "INSERT INTO " + tableName + " (";
+            for (int i = 0; i < data.Count; i++)
+            {
+                if (i == data.Count - 1)
+                    var1 += data.ElementAt(i).Key;
+                else
+                    var1 += data.ElementAt(i).Key + ",";
+            }
+            var1 += ") VALUES (";
+            for (int i = 0; i < data.Count; i++)
+            {
+                if (i == data.Count - 1)
+                    var1 += data.ElementAt(i).Value;
+                else
+                    var1 += data.ElementAt(i).Value + ",";
+            }
+            var1 += ");";
+
+            dbConnector.ExecuteNonQuery(var1);
         }
         
 
@@ -96,6 +151,7 @@ namespace Logging_Program
             dbConnector.Dispose();
             timer.Dispose();
         }
+        
     }
 }
 
@@ -103,22 +159,7 @@ namespace Logging_Program
 
 //        public void AddToDataSet(MainLib.UniqueMatch match)
 //        {
-//            DataRow row = dataSet.Tables[0].NewRow();
-//            row[0] = dataSet.Tables[0].Rows.Count;
-//            row[1] = match.MatchID;
-//            row[2] = match.Tournament;
-//            row[3] = match.Opp1;
-//            row[4] = match.Opp2;
-//            row[5] = match.Opp1Procent;
-//            row[6] = match.Opp2Procent;
-//            row[7] = match.Comment;
-//            row[8] = match.MatchCount;
-//            row[9] = match.Winner;
-//            row[10] = match.AmountOfPeopleBetting;
-//            row[11] = match.AmountOfItemsBetted;
-//            row[12] = match.Ago;
-//            row[13] = match.Time;
-//            row[14] = match.TimeWhenDataTaken;
+
 
 //            dataSet.Tables[0].Rows.Add(row);
 //        }
