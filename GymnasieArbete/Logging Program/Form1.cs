@@ -45,33 +45,46 @@ namespace Logging_Program
 
             notifyIcon1.Icon = Icon.ExtractAssociatedIcon(@"C:\Program Files (x86)\Mozilla Firefox\firefox.exe");
             notifyIcon1.DoubleClick += notifyIcon1_DoubleClick;
-
-            List<MainLib.UniqueMatch> list = MainLib.GatherData.grabInfoFromWeb(@"http://dota2lounge.com");
-            foreach (var item in list)
-            {
-                item.SaveToLoc(@"D:\DotaData\");
-                InsertToDatabase("dota_matches", new Dictionary<string, string>()
-                    {
-                        {"id",dotaMatchesCount.ToString()},
-                        {"match_id",item.MatchID.ToString()},
-                        //{"tournament","'" + item.Tournament + "'"},
-                        //{"opponent1","'" + item.Opp1 + "'"},
-                        //{"opponent2","'" + item.Opp2 + "'"},
-                        //{"opponent1_procent",item.Opp1Procent.ToString()},
-                        //{"opponent2_procent",item.Opp2Procent.ToString()},
-                        //{"comment","'" + item.Comment + "'"},
-                        //{"match_count",item.MatchCount.ToString()},
-                        //{"winner",item.Winner.ToString()},
-                        //{"people_betting",item.AmountOfPeopleBetting.ToString()},
-                        //{"items_betting",item.AmountOfItemsBetted.ToString()},
-                        //{"ago","'" + item.Ago + "'"},
-                        //{"time","'" + item.Time + "'"},
-                        //{"when_taken",DateTimeToUnixTimestamp(item.TimeWhenDataTaken).ToString()}
-                    });
-                dotaMatchesCount++;
-            }
         }
 
+        private void MainFunc(string path)
+        {
+            Dictionary<string, string> data;
+            foreach (var item in MainLib.GatherData.grabInfoFromWeb(path))
+            {
+                data = new Dictionary<string, string>();
+                data.Add("id", dotaMatchesCount.ToString());
+                data.Add("match_id", item.MatchID.ToString());
+                data.Add("opponent1_procent", item.Opp1Procent.ToString());
+                data.Add("opponent2_procent", item.Opp2Procent.ToString());
+                data.Add("match_count", item.MatchCount.ToString());
+                data.Add("people_betting", item.AmountOfPeopleBetting.ToString());
+                data.Add("items_betting", item.AmountOfItemsBetted.ToString());
+                data.Add("when_taken", DateTimeToUnixTimestamp(item.TimeWhenDataTaken).ToString());
+
+                if (item.Tournament != "")
+                    data.Add("tournament", "'" + item.Tournament + "'");
+                if (item.Opp1 != "")
+                    data.Add("opponent1", "'" + item.Opp1 + "'");
+                if (item.Opp2 != "")
+                    data.Add("opponent2", "'" + item.Opp2 + "'");
+                if (item.Comment != "")
+                    data.Add("comment", "'" + item.Comment + "'");
+                if (item.Winner != "")
+                    data.Add("winner", "'" + item.Winner + "'");
+                if (item.Ago != "")
+                    data.Add("ago","'" + item.Ago + "'");
+                if (item.Time != "")
+                    data.Add("time","'" + item.Time + "'");
+
+                if (path == @"http://dota2lounge.com")
+                {
+                    item.SaveToLoc(@"D:\DotaData\");
+                    InsertToDatabase("dota_matches", data);
+                    dotaMatchesCount++;
+                }
+            }
+        }
         private int DateTimeToUnixTimestamp(DateTime dateTime)
         {
             return (int)(dateTime - new DateTime(1970, 1, 1).ToLocalTime()).TotalSeconds;
@@ -110,6 +123,8 @@ namespace Logging_Program
             if (dateTime.CompareTo(DateTime.Now) <= 0)
             {
                 dateTime = DateTime.Now.AddMinutes(rand.Next(minTime, maxTime + 1));
+
+                MainFunc(@"http://dota2lounge.com");
             }
             if (this.WindowState == FormWindowState.Minimized)
                 notifyIcon1.Text = dateTime.Subtract(DateTime.Now).ToString(@"mm\:ss");
@@ -154,60 +169,3 @@ namespace Logging_Program
         
     }
 }
-
-
-
-//        public void AddToDataSet(MainLib.UniqueMatch match)
-//        {
-
-
-//            dataSet.Tables[0].Rows.Add(row);
-//        }
-//        public void updateDataBase()
-//        {
-//            try
-//            {
-//                objConnect.UpdateDatabase(dataSet);
-//                MessageBox.Show("Database updated");
-//            }
-//            catch (Exception err)
-//            {
-//                MessageBox.Show(err.Message);
-//            }
-//        }
-
-//        private void Form1_Load(object sender, EventArgs e)
-//        {
-//            try
-//            {
-//                objConnect = new ClassLibrary.DataBaseConnection();
-//                conString = Properties.Settings.Default.DataBaseConnectionString;
-//                objConnect.ConnectionString = conString;
-//                objConnect.Sql = @"SELECT * FROM MatchesTable";
-//                dataSet = objConnect.GetConnection;
-//            }
-//            catch (Exception err)
-//            {
-//                MessageBox.Show(err.Message);
-//            }
-//            dataGridView1.DataSource = dataSet.Tables[0];
-//        }
-//        private void buttonGatherData_Click(object sender, EventArgs e)
-//        {
-//            List<MainLib.UniqueMatch> list = MainLib.GatherData.grabInfoFromWeb(@"http://dota2lounge.com");
-//            foreach (var item in list)
-//            {
-//                AddToDataSet(item);
-//            }
-//            updateDataBase();
-//            dataGridView1.DataSource = dataSet.Tables[0];
-//            //list = MainLib.GatherData.grabInfoFromWeb(@"http://csgolounge.com");
-//            //foreach (var item in list)
-//            //    item.saveToLoc(@"D:\CsData\");
-//        }
-//        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-//        {
-//            dataSet.Dispose();
-//            objConnect.Dispose();
-//        }
-//    }

@@ -75,7 +75,8 @@ namespace MainLib
                 {
                     if (hasInternetConnection())
                     {
-                        VarClass.writeToLog("NoResponse", e.ToString(), request.Address.ToString(), e.Data.ToString(), e.TargetSite.ToString(), e.StackTrace.ToString(), e.Source.ToString(), e.Message.ToString(), e.InnerException.ToString());
+                        //TODO
+                        //VarClass.writeToLog("NoResponse", e.ToString(), request.Address.ToString(), e.Data.ToString(), e.TargetSite.ToString(), e.StackTrace.ToString(), e.Source.ToString(), e.Message.ToString(), e.InnerException.ToString());
                         System.Threading.Thread.Sleep(VarClass.FailedToConnecetSleep);
                     }
                     else
@@ -126,11 +127,11 @@ namespace MainLib
 
                 var matches = Regex.Matches(splits[0], "<b>");
                 result.Opp1 = splits[0].Substring(matches[matches.Count - 1].Index + matches[matches.Count - 1].Length);
-                result.Opp1 = result.Opp1.Split(' ')[0];
+                result.Opp1 = Regex.Replace(result.Opp1, @"[^a-zA-Z]", "");
 
                 matches = Regex.Matches(splits[1], "<b>");
                 result.Opp2 = splits[1].Substring(matches[matches.Count - 1].Index + matches[matches.Count - 1].Length);
-                result.Opp2 = result.Opp2.Split(' ')[0];
+                result.Opp2 = Regex.Replace(result.Opp2, @"[^a-zA-Z]", "");
 
                 result.Opp1Procent = int.Parse(Regex.Split(splits[1], @"%</i>")[0]);
                 result.Opp2Procent = int.Parse(Regex.Split(splits[2], @"%</i>")[0]);
@@ -157,6 +158,7 @@ namespace MainLib
                         result.Winner = result.Opp1;
                     else
                         result.Winner = result.Opp2;
+                    result.Winner = Regex.Replace(result.Winner, @"[^a-zA-Z]", "");
                 }
             }
             #endregion
@@ -237,8 +239,7 @@ namespace MainLib
             {
                 if (splits[i].Contains("predict"))
                     continue;
-                UniqueMatch dataMatch = processMainPageInfo(splits[i], mainLink);
-                list.Add(dataMatch);
+                list.Add(processMainPageInfo(splits[i], mainLink));
             }
             return list;
         }
