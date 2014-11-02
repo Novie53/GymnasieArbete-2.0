@@ -13,8 +13,8 @@ namespace Logging_Program
     public partial class Form1 : Form
     {
         private readonly int minTime = 2, maxTime = 5;
-        private Random rand = new Random();
-        private DateTime dateTime = new DateTime();
+        private readonly string databasePATH = @"C:\Users\Novie\Desktop\sqlite\test.db";
+        private DatabaseConncter dbConnector;
 
         /*
         *Ha Programmet i System Tray
@@ -38,13 +38,18 @@ namespace Logging_Program
             timer.Interval = 50;
             timer.Start();
 
+            dbConnector = new DatabaseConncter(@"Data Source=" + databasePATH + @";Version=3;");
+
             notifyIcon1.Icon = Icon.ExtractAssociatedIcon(@"C:\Program Files (x86)\Mozilla Firefox\firefox.exe");
             notifyIcon1.DoubleClick += notifyIcon1_DoubleClick;
         }
+        
 
+        #region Timer
 
-
-        Timer timer = new Timer();
+        private DateTime dateTime = new DateTime();
+        private Random rand = new Random();
+        private Timer timer = new Timer();
         void timer_Tick(object sender, EventArgs e)
         {
             if (dateTime.CompareTo(DateTime.Now) <= 0)
@@ -57,6 +62,7 @@ namespace Logging_Program
                 label1.Text = dateTime.Subtract(DateTime.Now).ToString(@"mm\:ss");
         }
 
+        #endregion
         #region NotificationIcon
 
         private NotifyIcon notifyIcon1 = new NotifyIcon();
@@ -83,6 +89,13 @@ namespace Logging_Program
         }
 
         #endregion
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            notifyIcon1.Dispose();
+            dbConnector.Dispose();
+            timer.Dispose();
+        }
     }
 }
 
@@ -157,30 +170,3 @@ namespace Logging_Program
 //            objConnect.Dispose();
 //        }
 //    }
-//}
-
-
-//namespace Learn_About_DATABASES
-//{
-//    public partial class Form1 : Form
-//    {
-//        readonly string databasePATH = @"C:\Users\Novie\Desktop\sqlite\test.db";
-//        Herp herp;
-
-//        public Form1()
-//        {
-//            InitializeComponent();
-//            herp = new Herp(@"Data Source=" + databasePATH + @";Version=3;");
-//        }
-
-//        private void Form1_Load(object sender, EventArgs e)
-//        {
-//            dataGridView1.DataSource = herp.ExecuteQuery("SELECT * FROM test");
-//        }
-
-//        private void button1_Click(object sender, EventArgs e)
-//        {
-//            herp.ListTables();
-//        }
-//    }
-//}

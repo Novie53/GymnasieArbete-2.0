@@ -6,15 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Learn_About_DATABASES
+namespace Logging_Program
 {
-    class Herp : IDisposable
+    class DatabaseConncter : IDisposable
     {
         private SQLiteConnection databaseConnection;
         private SQLiteCommand commander;
         private string conString;
 
-        public Herp(string conString)
+        public DatabaseConncter(string conString)
         {
             databaseConnection = new SQLiteConnection(conString);
             databaseConnection.Open();
@@ -22,8 +22,6 @@ namespace Learn_About_DATABASES
                 throw new Exception("Failed to open the Database");
             commander = databaseConnection.CreateCommand();
             this.conString = conString;
-
-            
         }
 
 
