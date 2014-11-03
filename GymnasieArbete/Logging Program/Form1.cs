@@ -8,13 +8,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace Logging_Program
 {
     public partial class Form1 : Form
     {
-        private readonly int minTime = 2, maxTime = 5;
-        private readonly string databasePATH = @"C:\Users\Novie\Desktop\GymnaArbete\mainDatabase.db";
         private DatabaseConncter dbConnector;
         private int dotaMatchesCount = 0;
 
@@ -40,7 +39,7 @@ namespace Logging_Program
             timer.Interval = 50;
             timer.Start();
 
-            dbConnector = new DatabaseConncter(@"Data Source=" + databasePATH + @";Version=3;");
+            dbConnector = new DatabaseConncter(@"Data Source=" + Config.databasePATH + @";Version=3;");
             dotaMatchesCount = dbConnector.getTableCount("dota_matches");
 
             notifyIcon1.Icon = Icon.ExtractAssociatedIcon(@"C:\Program Files (x86)\Mozilla Firefox\firefox.exe");
@@ -50,7 +49,7 @@ namespace Logging_Program
         private void MainFunc(string path)
         {
             Dictionary<string, string> data;
-            foreach (var item in MainLib.GatherData.grabInfoFromWeb(path))
+            foreach (var item in GatherData.grabInfoFromWeb(path))
             {
                 data = new Dictionary<string, string>();
                 data.Add("id", dotaMatchesCount.ToString());
@@ -111,25 +110,28 @@ namespace Logging_Program
 
             dbConnector.ExecuteNonQuery(var1);
         }
-        
+        private void Log(string logText)
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+                notifyIcon1.Text = logText;
+            else if (this.WindowState == FormWindowState.Normal)
+                label1.Text = logText;
+        }
 
         #region Timer
 
         private DateTime dateTime = new DateTime();
         private Random rand = new Random();
-        private Timer timer = new Timer();
+        private System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
         void timer_Tick(object sender, EventArgs e)
         {
             if (dateTime.CompareTo(DateTime.Now) <= 0)
             {
-                dateTime = DateTime.Now.AddMinutes(rand.Next(minTime, maxTime + 1));
+                dateTime = DateTime.Now.AddMinutes(rand.Next(Config.minTime, Config.maxTime + 1));
 
                 MainFunc(@"http://dota2lounge.com");
             }
-            if (this.WindowState == FormWindowState.Minimized)
-                notifyIcon1.Text = dateTime.Subtract(DateTime.Now).ToString(@"mm\:ss");
-            else if (this.WindowState == FormWindowState.Normal)
-                label1.Text = dateTime.Subtract(DateTime.Now).ToString(@"mm\:ss");
+            Log(dateTime.Subtract(DateTime.Now).ToString(@"mm\:ss"));
         }
 
         #endregion
