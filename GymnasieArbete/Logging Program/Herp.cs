@@ -124,7 +124,8 @@ namespace Logging_Program
                     }
                     else
                     {
-                        VarClass.writeToLog("NoInternet", e.ToString(), request.Address.ToString());
+                        //TODO
+                        //VarClass.writeToLog("NoInternet", e.ToString(), request.Address.ToString());
                     }
                 }
             }

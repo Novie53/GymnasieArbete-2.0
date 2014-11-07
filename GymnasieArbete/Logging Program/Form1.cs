@@ -99,8 +99,9 @@ namespace Logging_Program
         public void herpLeDerp(object state)
         {
             // WORK
+            MainFunc(@"http://dota2lounge.com/");
 
-            timer.Change(1000, Timeout.Infinite);
+            timer.Change(300000, Timeout.Infinite);//5 min
         }
 
 
@@ -136,14 +137,14 @@ namespace Logging_Program
                     data.Add("opponent2", "'" + item.Opp2 + "'");
                 if (item.Comment != "")
                     data.Add("comment", "'" + item.Comment + "'");
-                if (item.Winner != "")
+                if (item.Winner != "" || item.Winner == null)//TODO Dubbelkolla så denna är som den ska
                     data.Add("winner", "'" + item.Winner + "'");
                 if (item.Ago != "")
                     data.Add("ago", "'" + item.Ago + "'");
                 if (item.Time != "")
                     data.Add("time", "'" + item.Time + "'");
 
-                if (path == @"http://dota2lounge.com")
+                if (path.Contains("dota"))
                 {
                     item.SaveToLoc(@"D:\DotaData\");
                     InsertToDatabase("dota_matches", data);
