@@ -172,4 +172,38 @@ namespace Logging_Program
             dbConnector.ExecuteNonQuery(var1);
         }
     }
+    public class Logger
+    {
+        public enum LogTypes
+        {
+            Warning,
+            Errors,
+            Information
+        }
+        public string LogPath { get; set; }
+        public string CrashReportPath { get; set; }
+
+        public Logger(string logPath, string crashPath)
+        {
+            this.LogPath = logPath;
+            this.CrashReportPath = crashPath;
+        }
+
+        public void Warn(string text)
+        {
+
+        }
+        public void Debug(string text)
+        {
+
+        }
+        public void Error(string text)
+        {
+
+        }
+        public void Error(string text, Exception error)
+        {
+
+        }
+    }
 }
