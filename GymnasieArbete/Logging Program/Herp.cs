@@ -73,25 +73,9 @@ namespace Logging_Program
         public const int FailedToConnecetSleep = 10000;
         public const string version = "0.5.0";
         public const string logPath = @"C:\Users\Novie\Desktop\GymLog";
+        public const string crashPath = @"C:\Users\Novie\Desktop\GymLog\Crashes";
         public const int minTime = 2, maxTime = 5;
         public const string databasePATH = @"C:\Users\Novie\Desktop\GymnaArbete\mainDatabase.db";
-    }
-    public static class VarClass
-    {
-        public static void writeToLog(string error, params string[] datas)
-        {
-            string reportFolderPath = Path.Combine(Config.logPath, error);
-            Directory.CreateDirectory(reportFolderPath);
-
-            using (StreamWriter writer = new StreamWriter(Path.Combine(reportFolderPath, DateTime.Now.ToString().Replace(':', ',') + ".txt")))
-            {
-                writer.WriteLine("ErrorSlot - " + error);
-                writer.WriteLine("Version - " + Config.version);
-                writer.WriteLine("DateTime - " + DateTime.Now.ToString());
-                for (int i = 0; i < datas.Count(); i++)
-                    writer.WriteLine(datas[i]);
-            }
-        }
     }
     public static class GatherData
     {

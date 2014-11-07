@@ -15,7 +15,7 @@ namespace Logging_Program
     public partial class Form1 : Form
     {
         Worker worker;
-        
+        Logger log;
 
         /*
         *Ha Programmet i System Tray
@@ -31,11 +31,13 @@ namespace Logging_Program
         
 
 
-        public Form1()
+        public Form1(ref Logger log)
         {
+            this.log = log;
+            log.MainForm = this;
+            worker = new Worker();
             InitializeComponent();
 
-            worker = new Worker();
 
             notifyIcon1.Icon = Icon.ExtractAssociatedIcon(@"C:\Program Files (x86)\Mozilla Firefox\firefox.exe");
             notifyIcon1.DoubleClick += notifyIcon1_DoubleClick;
@@ -46,7 +48,7 @@ namespace Logging_Program
             notifyIcon1.Dispose();
             worker.Dispose();
         }
-        private void Log(string logText)
+        public void Log(string logText)
         {
             if (this.WindowState == FormWindowState.Minimized)
                 notifyIcon1.Text = logText;
@@ -182,7 +184,9 @@ namespace Logging_Program
         }
         public string LogPath { get; set; }
         public string CrashReportPath { get; set; }
+        public Form1 MainForm { get; set; }
 
+        
         public Logger(string logPath, string crashPath)
         {
             this.LogPath = logPath;
@@ -193,6 +197,20 @@ namespace Logging_Program
         {
 
         }
+        //public static void writeToLog(string error, params string[] datas)
+        //{
+        //    string reportFolderPath = Path.Combine(Config.logPath, error);
+        //    Directory.CreateDirectory(reportFolderPath);
+
+        //    using (StreamWriter writer = new StreamWriter(Path.Combine(reportFolderPath, DateTime.Now.ToString().Replace(':', ',') + ".txt")))
+        //    {
+        //        writer.WriteLine("ErrorSlot - " + error);
+        //        writer.WriteLine("Version - " + Config.version);
+        //        writer.WriteLine("DateTime - " + DateTime.Now.ToString());
+        //        for (int i = 0; i < datas.Count(); i++)
+        //            writer.WriteLine(datas[i]);
+        //    }
+        //}
         public void Debug(string text)
         {
 
@@ -203,7 +221,7 @@ namespace Logging_Program
         }
         public void Error(string text, Exception error)
         {
-
+            //Todo, TEMP, ta reda på vad som kan vara bra att spara och vad som kan lämnas
         }
     }
 }
