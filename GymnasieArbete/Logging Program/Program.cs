@@ -11,7 +11,7 @@ namespace Logging_Program
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        public static Logger log = new Logger(Config.logPath, Config.crashPath);
+        public static Logger log = new Logger(Config.logPath);
 
         [STAThread]
         static void Main()

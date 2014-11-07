@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using System.IO;
 
 namespace Logging_Program
 {
@@ -41,6 +42,8 @@ namespace Logging_Program
 
             notifyIcon1.Icon = Icon.ExtractAssociatedIcon(@"C:\Program Files (x86)\Mozilla Firefox\firefox.exe");
             notifyIcon1.DoubleClick += notifyIcon1_DoubleClick;
+
+            this.WindowState = FormWindowState.Minimized;
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -137,7 +140,7 @@ namespace Logging_Program
                     data.Add("opponent2", "'" + item.Opp2 + "'");
                 if (item.Comment != "")
                     data.Add("comment", "'" + item.Comment + "'");
-                if (item.Winner != "" || item.Winner == null)//TODO Dubbelkolla så denna är som den ska
+                if (item.Winner != "" && item.Winner != null)//TODO Dubbelkolla så denna är som den ska
                     data.Add("winner", "'" + item.Winner + "'");
                 if (item.Ago != "")
                     data.Add("ago", "'" + item.Ago + "'");
@@ -184,45 +187,51 @@ namespace Logging_Program
             Information
         }
         public string LogPath { get; set; }
-        public string CrashReportPath { get; set; }
         public Form1 MainForm { get; set; }
 
         
-        public Logger(string logPath, string crashPath)
+        public Logger(string logPath)
         {
             this.LogPath = logPath;
-            this.CrashReportPath = crashPath;
         }
 
         public void Warn(string text)
         {
 
         }
-        //public static void writeToLog(string error, params string[] datas)
-        //{
-        //    string reportFolderPath = Path.Combine(Config.logPath, error);
-        //    Directory.CreateDirectory(reportFolderPath);
-
-        //    using (StreamWriter writer = new StreamWriter(Path.Combine(reportFolderPath, DateTime.Now.ToString().Replace(':', ',') + ".txt")))
-        //    {
-        //        writer.WriteLine("ErrorSlot - " + error);
-        //        writer.WriteLine("Version - " + Config.version);
-        //        writer.WriteLine("DateTime - " + DateTime.Now.ToString());
-        //        for (int i = 0; i < datas.Count(); i++)
-        //            writer.WriteLine(datas[i]);
-        //    }
-        //}
         public void Debug(string text)
         {
 
         }
         public void Error(string text)
         {
-
+            using (StreamWriter writer = new StreamWriter(Path.Combine(Config.logPath, DateTime.Now.ToString().Replace(':', ',') + ".txt")))
+            {
+                writer.WriteLine("ErrorSlot - " + text);
+                writer.WriteLine("Version - " + Config.version);
+                writer.WriteLine("DateTime - " + DateTime.Now.ToString());
+            }
         }
         public void Error(string text, Exception error)
         {
-            //Todo, TEMP, ta reda på vad som kan vara bra att spara och vad som kan lämnas
+            Error(text);
+
+            File.AppendAllText(Path.Combine(Config.logPath, "1.txt"), error.Data.ToString());
+            File.AppendAllText(Path.Combine(Config.logPath, "2.txt"), error.HelpLink);
+            File.AppendAllText(Path.Combine(Config.logPath, "3.txt"), error.HResult.ToString());
+            File.AppendAllText(Path.Combine(Config.logPath, "4.txt"), error.Message);
+            File.AppendAllText(Path.Combine(Config.logPath, "5.txt"), error.Source);
+            File.AppendAllText(Path.Combine(Config.logPath, "6.txt"), error.StackTrace);
+            File.AppendAllText(Path.Combine(Config.logPath, "7.txt"), error.ToString());
+            File.AppendAllText(Path.Combine(Config.logPath, "8.txt"), error.TargetSite.ToString());
+            File.AppendAllText(Path.Combine(Config.logPath, "9.txt"), error.InnerException.Data.ToString());
+            File.AppendAllText(Path.Combine(Config.logPath, "10.txt"), error.InnerException.HelpLink);
+            File.AppendAllText(Path.Combine(Config.logPath, "11.txt"), error.InnerException.HResult.ToString());
+            File.AppendAllText(Path.Combine(Config.logPath, "12.txt"), error.InnerException.Message);
+            File.AppendAllText(Path.Combine(Config.logPath, "13.txt"), error.InnerException.Source);
+            File.AppendAllText(Path.Combine(Config.logPath, "14.txt"), error.InnerException.StackTrace);
+            File.AppendAllText(Path.Combine(Config.logPath, "15.txt"), error.InnerException.ToString());
+            File.AppendAllText(Path.Combine(Config.logPath, "16.txt"), error.InnerException.TargetSite.ToString());
         }
     }
 }
