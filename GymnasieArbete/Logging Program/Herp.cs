@@ -71,7 +71,7 @@ namespace Logging_Program
     {
         public const int ConnectionTries = 1000;
         public const int FailedToConnecetSleep = 10000;
-        public const string version = "0.6.0";
+        public const string version = "0.6.2";
         public const string logPath = @"C:\Users\Novie\Desktop\GymLog";
         public const int minTime = 2, maxTime = 5;
         public const string databasePATH = @"C:\Users\Novie\Desktop\GymnaArbete\mainDatabase.db";
@@ -215,15 +215,12 @@ namespace Logging_Program
             #endregion
             #region Betting
             {
-                string var6;
-                if (matchLink.Contains("dota"))
-                    var6 = Regex.Split(matchWindow, "full\">")[2];
-                else
-                    var6 = Regex.Split(matchWindow, "full\">")[3];
-
-                var6 = Regex.Split(var6, "</div>")[0];
-                var6 = var6.Trim();
-                string[] var5 = var6.Split(' ');
+                //string var6 = Regex.Split(matchWindow, "full\">")[2];
+                //var6 = Regex.Split(var6, "</div>")[0];
+                //var6 = var6.Trim();
+                //string[] var5 = var6.Split(' ');
+                
+                string[] var5 = Regex.Split(Regex.Split(matchWindow, "full\">")[2], "</div>")[0].Trim().Split(' ');
 
 
                 int tempVar;// Något bug på deras sida vilket gör att typ en gång i hundra så visar den inte amount så behöver TryParse

@@ -42,8 +42,6 @@ namespace Logging_Program
 
             notifyIcon1.Icon = Icon.ExtractAssociatedIcon(@"C:\Program Files (x86)\Mozilla Firefox\firefox.exe");
             notifyIcon1.DoubleClick += notifyIcon1_DoubleClick;
-
-            this.WindowState = FormWindowState.Minimized;
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -103,6 +101,7 @@ namespace Logging_Program
         {
             // WORK
             MainFunc(@"http://dota2lounge.com/");
+            MainFunc(@"http://csgolounge.com");
 
             timer.Change(300000, Timeout.Infinite);//5 min
         }
@@ -122,33 +121,37 @@ namespace Logging_Program
             Dictionary<string, string> data;
             foreach (var item in GatherData.grabInfoFromWeb(path))
             {
-                data = new Dictionary<string, string>();
-                data.Add("id", dotaMatchesCount.ToString());
-                data.Add("match_id", item.MatchID.ToString());
-                data.Add("opponent1_procent", item.Opp1Procent.ToString());
-                data.Add("opponent2_procent", item.Opp2Procent.ToString());
-                data.Add("match_count", item.MatchCount.ToString());
-                data.Add("people_betting", item.AmountOfPeopleBetting.ToString());
-                data.Add("items_betting", item.AmountOfItemsBetted.ToString());
-                data.Add("when_taken", DateTimeToUnixTimestamp(item.TimeWhenDataTaken).ToString());
-
-                if (item.Tournament != "")
-                    data.Add("tournament", "'" + item.Tournament + "'");
-                if (item.Opp1 != "")
-                    data.Add("opponent1", "'" + item.Opp1 + "'");
-                if (item.Opp2 != "")
-                    data.Add("opponent2", "'" + item.Opp2 + "'");
-                if (item.Comment != "")
-                    data.Add("comment", "'" + item.Comment + "'");
-                if (item.Winner != "" && item.Winner != null)//TODO Dubbelkolla så denna är som den ska
-                    data.Add("winner", "'" + item.Winner + "'");
-                if (item.Ago != "")
-                    data.Add("ago", "'" + item.Ago + "'");
-                if (item.Time != "")
-                    data.Add("time", "'" + item.Time + "'");
-
-                if (path.Contains("dota"))
+                if (path.Contains("csgo"))
                 {
+                    item.SaveToLoc(@"D:\CsData\");
+                }
+                else
+                {
+                    data = new Dictionary<string, string>();
+                    data.Add("id", dotaMatchesCount.ToString());
+                    data.Add("match_id", item.MatchID.ToString());
+                    data.Add("opponent1_procent", item.Opp1Procent.ToString());
+                    data.Add("opponent2_procent", item.Opp2Procent.ToString());
+                    data.Add("match_count", item.MatchCount.ToString());
+                    data.Add("people_betting", item.AmountOfPeopleBetting.ToString());
+                    data.Add("items_betting", item.AmountOfItemsBetted.ToString());
+                    data.Add("when_taken", DateTimeToUnixTimestamp(item.TimeWhenDataTaken).ToString());
+
+                    if (item.Tournament != "")
+                        data.Add("tournament", "'" + item.Tournament + "'");
+                    if (item.Opp1 != "")
+                        data.Add("opponent1", "'" + item.Opp1 + "'");
+                    if (item.Opp2 != "")
+                        data.Add("opponent2", "'" + item.Opp2 + "'");
+                    if (item.Comment != "")
+                        data.Add("comment", "'" + item.Comment + "'");
+                    if (item.Winner != "" && item.Winner != null)//TODO Dubbelkolla så denna är som den ska
+                        data.Add("winner", "'" + item.Winner + "'");
+                    if (item.Ago != "")
+                        data.Add("ago", "'" + item.Ago + "'");
+                    if (item.Time != "")
+                        data.Add("time", "'" + item.Time + "'");
+
                     item.SaveToLoc(@"D:\DotaData\");
                     InsertToDatabase("dota_matches", data);
                     dotaMatchesCount++;
