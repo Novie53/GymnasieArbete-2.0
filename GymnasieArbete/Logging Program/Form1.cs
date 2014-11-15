@@ -219,22 +219,11 @@ namespace Logging_Program
         {
             Error(text);
 
-            File.AppendAllText(Path.Combine(Config.logPath, "1.txt"), error.Data.ToString());
-            File.AppendAllText(Path.Combine(Config.logPath, "2.txt"), error.HelpLink);
-            File.AppendAllText(Path.Combine(Config.logPath, "3.txt"), error.HResult.ToString());
             File.AppendAllText(Path.Combine(Config.logPath, "4.txt"), error.Message);
             File.AppendAllText(Path.Combine(Config.logPath, "5.txt"), error.Source);
             File.AppendAllText(Path.Combine(Config.logPath, "6.txt"), error.StackTrace);
             File.AppendAllText(Path.Combine(Config.logPath, "7.txt"), error.ToString());
             File.AppendAllText(Path.Combine(Config.logPath, "8.txt"), error.TargetSite.ToString());
-            File.AppendAllText(Path.Combine(Config.logPath, "9.txt"), error.InnerException.Data.ToString());
-            File.AppendAllText(Path.Combine(Config.logPath, "10.txt"), error.InnerException.HelpLink);
-            File.AppendAllText(Path.Combine(Config.logPath, "11.txt"), error.InnerException.HResult.ToString());
-            File.AppendAllText(Path.Combine(Config.logPath, "12.txt"), error.InnerException.Message);
-            File.AppendAllText(Path.Combine(Config.logPath, "13.txt"), error.InnerException.Source);
-            File.AppendAllText(Path.Combine(Config.logPath, "14.txt"), error.InnerException.StackTrace);
-            File.AppendAllText(Path.Combine(Config.logPath, "15.txt"), error.InnerException.ToString());
-            File.AppendAllText(Path.Combine(Config.logPath, "16.txt"), error.InnerException.TargetSite.ToString());
         }
     }
 }

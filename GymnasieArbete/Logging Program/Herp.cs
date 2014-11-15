@@ -71,7 +71,7 @@ namespace Logging_Program
     {
         public const int ConnectionTries = 1000;
         public const int FailedToConnecetSleep = 10000;
-        public const string version = "0.6.2";
+        public const string version = "0.6.3";
         public const string logPath = @"C:\Users\Novie\Desktop\GymLog";
         public const int minTime = 2, maxTime = 5;
         public const string databasePATH = @"C:\Users\Novie\Desktop\GymnaArbete\mainDatabase.db";
