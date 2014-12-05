@@ -101,7 +101,7 @@ namespace Logging_Program
         {
             // WORK
             MainFunc(@"http://dota2lounge.com/");
-            MainFunc(@"http://csgolounge.com");
+            //MainFunc(@"http://csgolounge.com");
 
             timer.Change(300000, Timeout.Infinite);//5 min
         }
@@ -179,51 +179,6 @@ namespace Logging_Program
             var1 += ");";
 
             dbConnector.ExecuteNonQuery(var1);
-        }
-    }
-    public class Logger
-    {
-        public enum LogTypes
-        {
-            Warning,
-            Errors,
-            Information
-        }
-        public string LogPath { get; set; }
-        public Form1 MainForm { get; set; }
-
-        
-        public Logger(string logPath)
-        {
-            this.LogPath = logPath;
-        }
-
-        public void Warn(string text)
-        {
-
-        }
-        public void Debug(string text)
-        {
-
-        }
-        public void Error(string text)
-        {
-            using (StreamWriter writer = new StreamWriter(Path.Combine(Config.logPath, DateTime.Now.ToString().Replace(':', ',') + ".txt")))
-            {
-                writer.WriteLine("ErrorSlot - " + text);
-                writer.WriteLine("Version - " + Config.version);
-                writer.WriteLine("DateTime - " + DateTime.Now.ToString());
-            }
-        }
-        public void Error(string text, Exception error)
-        {
-            Error(text);
-
-            File.AppendAllText(Path.Combine(Config.logPath, "4.txt"), error.Message);
-            File.AppendAllText(Path.Combine(Config.logPath, "5.txt"), error.Source);
-            File.AppendAllText(Path.Combine(Config.logPath, "6.txt"), error.StackTrace);
-            File.AppendAllText(Path.Combine(Config.logPath, "7.txt"), error.ToString());
-            File.AppendAllText(Path.Combine(Config.logPath, "8.txt"), error.TargetSite.ToString());
         }
     }
 }

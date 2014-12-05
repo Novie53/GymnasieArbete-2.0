@@ -11,6 +11,15 @@ using System.Threading.Tasks;
 
 namespace Logging_Program
 {
+    public static class Config
+    {
+        public const int ConnectionTries = 1000;
+        public const int FailedToConnecetSleep = 10000;
+        public const string version = "0.6.4";
+        public const string logPath = @"C:\Users\Novie\Desktop\GymLog";
+        public const int minTime = 2, maxTime = 5;
+        public const string databasePATH = @"C:\Users\Novie\Desktop\GymnaArbete\mainDatabase.db";
+    }
     public class DatabaseConncter : IDisposable
     {
         private SQLiteConnection databaseConnection;
@@ -66,15 +75,6 @@ namespace Logging_Program
         {
             set { conString = value; }
         }
-    }
-    public static class Config
-    {
-        public const int ConnectionTries = 1000;
-        public const int FailedToConnecetSleep = 10000;
-        public const string version = "0.6.3";
-        public const string logPath = @"C:\Users\Novie\Desktop\GymLog";
-        public const int minTime = 2, maxTime = 5;
-        public const string databasePATH = @"C:\Users\Novie\Desktop\GymnaArbete\mainDatabase.db";
     }
     public static class GatherData
     {
@@ -419,6 +419,66 @@ namespace Logging_Program
             using (StreamWriter writer = new StreamWriter(Path.Combine(loc, matchID + ".txt"), true))
             {
                 writer.WriteLine(builder.ToString());
+            }
+        }
+    }
+    public class Logger
+    {
+        public enum LogTypes
+        {
+            Warning,
+            Errors,
+            Information
+        }
+        public string LogPath { get; set; }
+        public Form1 MainForm { get; set; }
+
+
+        public Logger(string logPath)
+        {
+            this.LogPath = logPath;
+        }
+
+        public void Warn(string text)
+        {
+
+        }
+        public void Debug(string text)
+        {
+
+        }
+        public void Error(string text)
+        {
+            using (StreamWriter writer = new StreamWriter(Path.Combine(Config.logPath, DateTime.Now.ToString().Replace(':', ',') + ".txt")))
+            {
+                writer.WriteLine("ErrorSlot - " + text);
+                writer.WriteLine("Version - " + Config.version);
+                writer.WriteLine("DateTime - " + DateTime.Now.ToString());
+            }
+        }
+        public void Error(string text, Exception error)
+        {
+            using (StreamWriter writer = new StreamWriter(Path.Combine(Config.logPath, DateTime.Now.ToString().Replace(':', ',') + ".txt")))
+            {
+                writer.WriteLine("ErrorSlot - " + text);
+                writer.WriteLine("Version - " + Config.version);
+                writer.WriteLine("DateTime - " + DateTime.Now.ToString());
+                writer.WriteLine();
+                writer.WriteLine("---------------------------");
+                writer.WriteLine();
+                writer.WriteLine(error.Message);
+                writer.WriteLine();
+                writer.WriteLine("---------------------------");
+                writer.WriteLine();
+                writer.WriteLine(error.Source);
+                writer.WriteLine();
+                writer.WriteLine("---------------------------");
+                writer.WriteLine();
+                writer.WriteLine(error.StackTrace);
+                writer.WriteLine();
+                writer.WriteLine("---------------------------");
+                writer.WriteLine();
+                writer.WriteLine(error.ToString());
             }
         }
     }
