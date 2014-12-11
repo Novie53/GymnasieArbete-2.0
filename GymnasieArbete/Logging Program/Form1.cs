@@ -21,8 +21,11 @@ namespace Logging_Program
         /*
         *Ha Programmet i System Tray
 	    *Någon form av timer för att kontinuellt hämta data från internet
+            HögerKlick propties i notifyIcon, typ som Avsluta, och kanske info om programmet håller på att hämta just då
+            Pausa kanske?
 	        Impenter koppling till databas och möjlighet att lagra och hämta information
 	        Konventerar över allt från Text filer till databasen
+            Tydligen är det bättre att skapa en ny databasConnection varje gång istället för att hålla uppe en.
         *Skapa en config plats/class
 	        Fixa så att alla krashar lagras på ett bra sätt
         *Separat Thread för hämtning så Form Threaded inte fastnar?
@@ -78,14 +81,17 @@ namespace Logging_Program
     public class Worker : IDisposable
     {
         private int dotaTableCount;
-        private DatabaseConncter dbConnector;
+        private string dbConString;
         System.Threading.Timer timer;
 
         public Worker()
         {
-            dbConnector = new DatabaseConncter(@"Data Source=" + Config.databasePATH + @";Version=3;");
-            dotaTableCount = dbConnector.getTableCount("dota_matches");
-            timer = new System.Threading.Timer(herpLeDerp, null, 1000, Timeout.Infinite);
+            dbConString = @"Data Source=" + Config.databasePATH + @";Version=3;";
+            using (DatabaseConncter dbConnector = new DatabaseConncter(dbConString))
+            {
+                dotaTableCount = dbConnector.getTableCount("dota_matches");
+            }
+            timer = new System.Threading.Timer(herpLeDerp, null, 5000, Timeout.Infinite);
         }
 
         public void herpLeDerp(object state)
@@ -99,7 +105,6 @@ namespace Logging_Program
 
         public void Dispose()
         {
-            dbConnector.Dispose();
             timer.Dispose();
         }
         private int DateTimeToUnixTimestamp(DateTime dateTime)
@@ -161,7 +166,10 @@ namespace Logging_Program
             }
             var1 += ");";
 
-            dbConnector.ExecuteNonQuery(var1);
+            using (DatabaseConncter dbConnector = new DatabaseConncter(dbConString))
+            {
+                dbConnector.ExecuteNonQuery(var1);
+            }
         }
     }
 }

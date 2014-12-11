@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>7147df89-7f0f-45b3-ad7b-2dcaff28ff68</ProjectGuid>
+    <ProjectGuid>{D1682B16-DE96-4D8C-AAC7-6406DB8638AE}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Display</RootNamespace>
@@ -73,6 +73,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Logging Program\Logging Program%28MAIN%29.csproj">
+      <Project>{40697170-8f12-438b-b39e-64e73ab866de}</Project>
+      <Name>Logging Program%28MAIN%29</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
