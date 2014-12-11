@@ -25,7 +25,9 @@ namespace Logging_Program
             Pausa kanske?
 	        Impenter koppling till databas och möjlighet att lagra och hämta information
 	        Konventerar över allt från Text filer till databasen
-            Tydligen är det bättre att skapa en ny databasConnection varje gång istället för att hålla uppe en.
+        *Tydligen är det bättre att skapa en ny databasConnection varje gång istället för att hålla uppe en.
+            Värt att göra om så man skickar all data på en och samma gång istället för att skicka dem en och en?
+                Så istället för att kalla på InsertIntoDataase 10-20 gånger per 5 minuter så blir det 1 gång per 5 min?
         *Skapa en config plats/class
 	        Fixa så att alla krashar lagras på ett bra sätt
         *Separat Thread för hämtning så Form Threaded inte fastnar?
