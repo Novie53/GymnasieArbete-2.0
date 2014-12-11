@@ -20,14 +20,12 @@ namespace Logging_Program
 
         /*
         *Ha Programmet i System Tray
-	        Någon form av timer för att kontinuellt hämta data från internet
+	    *Någon form av timer för att kontinuellt hämta data från internet
 	        Impenter koppling till databas och möjlighet att lagra och hämta information
-	        Spara Functionerna som skriver till text fil som backup
 	        Konventerar över allt från Text filer till databasen
-            Skapa en config plats/class
+        *Skapa en config plats/class
 	        Fixa så att alla krashar lagras på ett bra sätt
-	
-        Separat Thread för hämtning så Form Threaded inte fastnar?
+        *Separat Thread för hämtning så Form Threaded inte fastnar?
         */
         
 
@@ -35,7 +33,6 @@ namespace Logging_Program
         public Form1(ref Logger log)
         {
             this.log = log;
-            log.MainForm = this;
             worker = new Worker();
             InitializeComponent();
 
@@ -48,13 +45,6 @@ namespace Logging_Program
         {
             notifyIcon1.Dispose();
             worker.Dispose();
-        }
-        public void Log(string logText)
-        {
-            if (this.WindowState == FormWindowState.Minimized)
-                notifyIcon1.Text = logText;
-            else if (this.WindowState == FormWindowState.Normal)
-                label1.Text = logText;
         }
 
         #region NotificationIcon
@@ -73,7 +63,7 @@ namespace Logging_Program
             if (this.WindowState == FormWindowState.Minimized)
             {
                 notifyIcon1.Visible = true;
-                notifyIcon1.ShowBalloonTip(5000);
+                notifyIcon1.ShowBalloonTip(1000);
                 this.Hide();
             }
             else if (this.WindowState == FormWindowState.Normal)
@@ -84,16 +74,17 @@ namespace Logging_Program
 
         #endregion
     }
+    
     public class Worker : IDisposable
     {
-        private int dotaMatchesCount;
+        private int dotaTableCount;
         private DatabaseConncter dbConnector;
         System.Threading.Timer timer;
 
         public Worker()
         {
             dbConnector = new DatabaseConncter(@"Data Source=" + Config.databasePATH + @";Version=3;");
-            dotaMatchesCount = dbConnector.getTableCount("dota_matches");
+            dotaTableCount = dbConnector.getTableCount("dota_matches");
             timer = new System.Threading.Timer(herpLeDerp, null, 1000, Timeout.Infinite);
         }
 
@@ -101,7 +92,6 @@ namespace Logging_Program
         {
             // WORK
             MainFunc(@"http://dota2lounge.com/");
-            //MainFunc(@"http://csgolounge.com");
 
             timer.Change(300000, Timeout.Infinite);//5 min
         }
@@ -121,41 +111,34 @@ namespace Logging_Program
             Dictionary<string, string> data;
             foreach (var item in GatherData.grabInfoFromWeb(path))
             {
-                if (path.Contains("csgo"))
-                {
-                    item.SaveToLoc(@"D:\CsData\");
-                }
-                else
-                {
-                    data = new Dictionary<string, string>();
-                    data.Add("id", dotaMatchesCount.ToString());
-                    data.Add("match_id", item.MatchID.ToString());
-                    data.Add("opponent1_procent", item.Opp1Procent.ToString());
-                    data.Add("opponent2_procent", item.Opp2Procent.ToString());
-                    data.Add("match_count", item.MatchCount.ToString());
-                    data.Add("people_betting", item.AmountOfPeopleBetting.ToString());
-                    data.Add("items_betting", item.AmountOfItemsBetted.ToString());
-                    data.Add("when_taken", DateTimeToUnixTimestamp(item.TimeWhenDataTaken).ToString());
+                data = new Dictionary<string, string>();
+                data.Add("id", dotaTableCount.ToString());
+                data.Add("match_id", item.MatchID.ToString());
+                data.Add("opponent1_procent", item.Opp1Procent.ToString());
+                data.Add("opponent2_procent", item.Opp2Procent.ToString());
+                data.Add("match_count", item.MatchCount.ToString());
+                data.Add("people_betting", item.AmountOfPeopleBetting.ToString());
+                data.Add("items_betting", item.AmountOfItemsBetted.ToString());
+                data.Add("when_taken", DateTimeToUnixTimestamp(item.TimeWhenDataTaken).ToString());
 
-                    if (item.Tournament != "")
-                        data.Add("tournament", "'" + item.Tournament + "'");
-                    if (item.Opp1 != "")
-                        data.Add("opponent1", "'" + item.Opp1 + "'");
-                    if (item.Opp2 != "")
-                        data.Add("opponent2", "'" + item.Opp2 + "'");
-                    if (item.Comment != "")
-                        data.Add("comment", "'" + item.Comment + "'");
-                    if (item.Winner != "" && item.Winner != null)//TODO Dubbelkolla så denna är som den ska
-                        data.Add("winner", "'" + item.Winner + "'");
-                    if (item.Ago != "")
-                        data.Add("ago", "'" + item.Ago + "'");
-                    if (item.Time != "")
-                        data.Add("time", "'" + item.Time + "'");
+                if (item.Tournament != "")
+                    data.Add("tournament", "'" + item.Tournament + "'");
+                if (item.Opp1 != "")
+                    data.Add("opponent1", "'" + item.Opp1 + "'");
+                if (item.Opp2 != "")
+                    data.Add("opponent2", "'" + item.Opp2 + "'");
+                if (item.Comment != "")
+                    data.Add("comment", "'" + item.Comment + "'");
+                if (item.Winner != "" && item.Winner != null)//TODO Dubbelkolla så denna är som den ska
+                    data.Add("winner", "'" + item.Winner + "'");
+                if (item.Ago != "")
+                    data.Add("ago", "'" + item.Ago + "'");
+                if (item.Time != "")
+                    data.Add("time", "'" + item.Time + "'");
 
-                    item.SaveToLoc(@"D:\DotaData\");
-                    InsertToDatabase("dota_matches", data);
-                    dotaMatchesCount++;
-                }
+                item.SaveToLoc(@"D:\DotaData\");
+                InsertToDatabase("dota_matches", data);
+                dotaTableCount++;
             }
         }
         private void InsertToDatabase(string tableName, Dictionary<string, string> data)

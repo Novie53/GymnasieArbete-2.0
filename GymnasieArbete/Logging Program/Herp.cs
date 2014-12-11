@@ -76,6 +76,7 @@ namespace Logging_Program
             set { conString = value; }
         }
     }
+    
     public static class GatherData
     {
         private static bool hasInternetConnection()
@@ -422,6 +423,7 @@ namespace Logging_Program
             }
         }
     }
+    
     public class Logger
     {
         public enum LogTypes
@@ -431,7 +433,6 @@ namespace Logging_Program
             Information
         }
         public string LogPath { get; set; }
-        public Form1 MainForm { get; set; }
 
 
         public Logger(string logPath)
