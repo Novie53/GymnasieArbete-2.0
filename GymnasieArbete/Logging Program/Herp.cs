@@ -170,10 +170,14 @@ namespace Logging_Program
 
                 var matches = Regex.Matches(splits[0], "<b>");
                 result.Opp1 = splits[0].Substring(matches[matches.Count - 1].Index + matches[matches.Count - 1].Length);
+                if (result.Opp1.Contains("(win)"))
+                    result.Opp1 = result.Opp1.Remove(5);
                 result.Opp1 = Regex.Replace(result.Opp1, @"[^a-zA-Z]", "");
 
                 matches = Regex.Matches(splits[1], "<b>");
                 result.Opp2 = splits[1].Substring(matches[matches.Count - 1].Index + matches[matches.Count - 1].Length);
+                if (result.Opp2.Contains("(win)"))
+                    result.Opp2 = result.Opp2.Remove(5);
                 result.Opp2 = Regex.Replace(result.Opp2, @"[^a-zA-Z]", "");
 
                 result.Opp1Procent = int.Parse(Regex.Split(splits[1], @"%</i>")[0]);
@@ -241,7 +245,7 @@ namespace Logging_Program
 
             #region tournament
             {
-                tour = Regex.Split(data, "right\">")[1];
+                tour = Regex.Split(data, "eventm\">")[1];
                 tour = Regex.Split(tour, "</div>")[0];
                 tour = tour.Trim();
             }
@@ -255,26 +259,31 @@ namespace Logging_Program
             #endregion
             #region comment
             {
-                comment = Regex.Split(data, "#D12121\"> ")[1];
-                comment = Regex.Split(comment, "</span>")[0];
+                //FIX
+                //TODO
+                comment = "";
+                //comment = Regex.Split(data, "#D12121\"> ")[1];
+                //comment = Regex.Split(comment, "</span>")[0];
             }
             #endregion
 
             UniqueMatch newInfo = grabInfoFromMatchPage(mainLink + "/match?m=" + matchID);
             newInfo.Tournament = tour;
-            newInfo.MatchID = matchID;
             newInfo.Comment = comment;
 
             return newInfo;
         }
         public static List<UniqueMatch> grabInfoFromWeb(string mainLink)
         {
+            List<UniqueMatch> list = new List<UniqueMatch>();
             string mainPageData = getHTML(mainLink);
 
-            mainPageData = mainPageData.Substring(Regex.Matches(mainPageData, "<section class=\"box\">")[1].Index);
 
+            mainPageData = mainPageData.Substring(Regex.Matches(mainPageData, "<section class=\"box\">")[1].Index);
+            mainPageData = mainPageData.Remove(Regex.Match(mainPageData, "<aside id=\"submenu\">").Index);
             string[] splits = Regex.Split(mainPageData, "<div class=\"matchmain\">");
-            List<UniqueMatch> list = new List<UniqueMatch>();
+
+
             for (int i = 1; i < splits.Count(); i++)
             {
                 if (splits[i].Contains("predict"))
@@ -467,10 +476,6 @@ namespace Logging_Program
                 writer.WriteLine("---------------------------");
                 writer.WriteLine();
                 writer.WriteLine(error.Message);
-                writer.WriteLine();
-                writer.WriteLine("---------------------------");
-                writer.WriteLine();
-                writer.WriteLine(error.Source);
                 writer.WriteLine();
                 writer.WriteLine("---------------------------");
                 writer.WriteLine();
