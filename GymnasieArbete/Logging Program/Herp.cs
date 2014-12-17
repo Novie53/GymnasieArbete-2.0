@@ -15,7 +15,7 @@ namespace Logging_Program
     {
         public const int ConnectionTries = 1000;
         public const int FailedToConnecetSleep = 10000;
-        public const string version = "0.7.1";
+        public const string version = "0.7.2";
         public const string logPath = @"C:\Users\Novie\Desktop\GymLog";
         public const string databasePATH = @"C:\Users\Novie\Desktop\GymnaArbete\mainDatabase.db";
     }
@@ -24,6 +24,9 @@ namespace Logging_Program
         private SQLiteConnection databaseConnection;
         private SQLiteCommand commander;
         private string conString;
+        private bool autoFlush = true;
+        StringBuilder flushedSQLCommands = new StringBuilder();
+
 
         public DatabaseConncter(string conString)
         {
@@ -35,6 +38,12 @@ namespace Logging_Program
             this.conString = conString;
         }
 
+
+        public bool AutoFlush
+        {
+            get { return autoFlush; }
+            set { autoFlush = value; }
+        }
         public int getTableCount(string tableName)
         {
             return int.Parse(ExecuteQuery(@"SELECT COUNT(*) FROM " + tableName).Rows[0].ItemArray[0].ToString());
@@ -49,10 +58,24 @@ namespace Logging_Program
             }
             return tables;
         }
+        private void ExecuteNonQuery(bool ignoreFlush, string SQL)
+        {
+            if (ignoreFlush)
+            {
+                commander.CommandText = SQL;
+                commander.ExecuteNonQuery();
+            }
+        }
         public void ExecuteNonQuery(string SQL)
         {
-            commander.CommandText = SQL;
-            commander.ExecuteNonQuery();
+            if (autoFlush)
+                ExecuteNonQuery(true, SQL);
+            else
+                flushedSQLCommands.Append(SQL);
+        }
+        public void Flush()
+        {
+            ExecuteNonQuery(true, flushedSQLCommands.ToString());
         }
         public DataTable ExecuteQuery(string SQL)
         {

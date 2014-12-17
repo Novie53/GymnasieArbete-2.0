@@ -21,6 +21,8 @@ namespace Logging_Program
         /*
         *Ha Programmet i System Tray
 	    *Någon form av timer för att kontinuellt hämta data från internet
+         *  Lägga in Flush mekanik i databas saken
+         *  med AutoFlash
             HögerKlick propties i notifyIcon, typ som Avsluta, och kanske info om programmet håller på att hämta just då
             Pausa kanske?
 	        Impenter koppling till databas och möjlighet att lagra och hämta information
