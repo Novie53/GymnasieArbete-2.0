@@ -31,27 +31,19 @@ namespace Logging_Program
         public DatabaseConncter(string conString)
         {
             databaseConnection = new SQLiteConnection(conString);
-            databaseConnection.Open();
-            if (databaseConnection.State != System.Data.ConnectionState.Open)
-                throw new Exception("Failed to open the Database");
-            commander = databaseConnection.CreateCommand();
             this.conString = conString;
         }
 
-
-        public bool AutoFlush
-        {
-            get { return autoFlush; }
-            set { autoFlush = value; }
-        }
         public int getTableCount(string tableName)
         {
             return int.Parse(ExecuteQuery(@"SELECT COUNT(*) FROM " + tableName).Rows[0].ItemArray[0].ToString());
         }
         public List<string> ListTables()
         {
+            Open();
             List<string> tables = new List<string>();
             DataTable asd = databaseConnection.GetSchema("Tables");
+            Close();
             foreach (DataRow item in asd.Rows)
             {
                 tables.Add(item[2].ToString());
@@ -62,8 +54,10 @@ namespace Logging_Program
         {
             if (ignoreFlush)
             {
+                Open();
                 commander.CommandText = SQL;
                 commander.ExecuteNonQuery();
+                Close();
             }
         }
         public void ExecuteNonQuery(string SQL)
@@ -79,13 +73,33 @@ namespace Logging_Program
         }
         public DataTable ExecuteQuery(string SQL)
         {
+            Open();
             commander.CommandText = SQL;
+            DataTable table = new DataTable();
             using (SQLiteDataReader reader = commander.ExecuteReader())
             {
-                DataTable table = new DataTable();
                 table.Load(reader);
-                return table;
             }
+            Close();
+            return table;
+        }
+
+
+        private void Open()
+        {
+            databaseConnection.Open();
+            if (databaseConnection.State != System.Data.ConnectionState.Open)
+                throw new Exception("Failed to open the Database");
+            commander = databaseConnection.CreateCommand();
+        }
+        private void Close()
+        {
+            databaseConnection.Close();
+        }
+        public bool AutoFlush
+        {
+            get { return autoFlush; }
+            set { autoFlush = value; }
         }
         public void Dispose()
         {
