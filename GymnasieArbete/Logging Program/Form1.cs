@@ -120,22 +120,22 @@ namespace Logging_Program
             {
                 data = new Dictionary<string, string>();
                 data.Add("id", dotaTableCount.ToString());
-                data.Add("match_id", item.MatchID.ToString());
-                data.Add("opponent1_procent", item.Opp1Procent.ToString());
-                data.Add("opponent2_procent", item.Opp2Procent.ToString());
-                data.Add("match_count", item.MatchCount.ToString());
-                data.Add("people_betting", item.AmountOfPeopleBetting.ToString());
-                data.Add("items_betting", item.AmountOfItemsBetted.ToString());
-                data.Add("when_taken", DateTimeToUnixTimestamp(item.TimeWhenDataTaken).ToString());
+                data.Add("match_id", item.matchID.ToString());
+                data.Add("opponent1_procent", item.opp1Procent.ToString());
+                data.Add("opponent2_procent", item.opp2Procent.ToString());
+                data.Add("match_count", item.matchCount.ToString());
+                data.Add("people_betting", item.amountOfPeopleBetting.ToString());
+                data.Add("items_betting", item.amountOfItemsBetted.ToString());
+                data.Add("when_taken", DateTimeToUnixTimestamp(item.timeWhenDataTaken).ToString());
 
-                data.Add("comment", item.Comment);
-                data.Add("ago", item.Ago);
-                data.Add("time", item.Time);
+                data.Add("comment", item.comment);
+                data.Add("ago", item.ago);
+                data.Add("time", item.time);
 
-                data.Add("tournament", findName(item.Tournament).ToString());
-                data.Add("opponent1", findName(item.Opp1).ToString());
-                data.Add("opponent2", findName(item.Opp2).ToString());
-                data.Add("winner", findName(item.Winner).ToString());
+                data.Add("tournament", findName(item.tournament).ToString());
+                data.Add("opponent1", findName(item.opp1).ToString());
+                data.Add("opponent2", findName(item.opp2).ToString());
+                data.Add("winner", findName(item.winner).ToString());
 
 
                 InsertToDatabase("dota_matches", data);

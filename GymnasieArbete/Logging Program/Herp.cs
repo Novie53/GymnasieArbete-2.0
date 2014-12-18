@@ -198,40 +198,41 @@ namespace Logging_Program
             UniqueMatch result = new UniqueMatch();
 
             string matchWindow = getHTML(matchLink);
-            result.TimeWhenDataTaken = DateTime.Now;
+            result.timeWhenDataTaken = DateTime.Now;
             matchWindow = Regex.Split(matchWindow, "<div class=\"title\">last 30 bets</div>")[0];
 
 
             #region MatchID
             {
-                result.MatchID = int.Parse(matchLink.Split('=')[1]);
+                result.matchID = int.Parse(matchLink.Split('=')[1]);
             }
             #endregion
             #region Opponents & Winner
             {
+                result.winner = "";
                 string[] splits = Regex.Split(matchWindow, @"</b><br><i>");
 
                 var matches = Regex.Matches(splits[0], "<b>");
-                result.Opp1 = splits[0].Substring(matches[matches.Count - 1].Index + matches[matches.Count - 1].Length);
-                if (result.Opp1.Contains("(win)"))
+                result.opp1 = splits[0].Substring(matches[matches.Count - 1].Index + matches[matches.Count - 1].Length);
+                if (result.opp1.Contains("(win)"))
                 {
-                    result.Opp1 = result.Opp1.Remove(5);
-                    result.Winner = result.Opp1;
+                    result.opp1 = result.opp1.Remove(5);
+                    result.winner = result.opp1;
                 }
                 
                 matches = Regex.Matches(splits[1], "<b>");
-                result.Opp2 = splits[1].Substring(matches[matches.Count - 1].Index + matches[matches.Count - 1].Length);
-                if (result.Opp2.Contains("(win)"))
+                result.opp2 = splits[1].Substring(matches[matches.Count - 1].Index + matches[matches.Count - 1].Length);
+                if (result.opp2.Contains("(win)"))
                 {
-                    result.Opp2 = result.Opp2.Remove(5);
-                    result.Winner = result.Opp2;
+                    result.opp2 = result.opp2.Remove(5);
+                    result.winner = result.opp2;
                 }
 
-                result.Opp1Procent = int.Parse(Regex.Split(splits[1], @"%</i>")[0]);
-                result.Opp2Procent = int.Parse(Regex.Split(splits[2], @"%</i>")[0]);
-                result.Opp1 = Regex.Replace(result.Opp1, @"[^a-zA-Z0-9 ]", "").ToLower();
-                result.Opp2 = Regex.Replace(result.Opp1, @"[^a-zA-Z0-9 ]", "").ToLower();
-                result.Winner = Regex.Replace(result.Winner, @"[^a-zA-Z0-9 ]", "").ToLower();
+                result.opp1Procent = int.Parse(Regex.Split(splits[1], @"%</i>")[0]);
+                result.opp2Procent = int.Parse(Regex.Split(splits[2], @"%</i>")[0]);
+                result.opp1 = Regex.Replace(result.opp1, @"[^a-zA-Z0-9 ]", "").ToLower();
+                result.opp2 = Regex.Replace(result.opp1, @"[^a-zA-Z0-9 ]", "").ToLower();
+                result.winner = Regex.Replace(result.winner, @"[^a-zA-Z0-9 ]", "").ToLower();
             }
             #endregion
             #region antalMatcher
@@ -240,15 +241,15 @@ namespace Logging_Program
                 rawData = Regex.Split(rawData, "</div>")[0];
                 rawData = Regex.Replace(rawData, "[^0-9]", ""); //Borde verkligen lära mig regex ^^
                 if (rawData != "")
-                    result.MatchCount = int.Parse(rawData);
+                    result.matchCount = int.Parse(rawData);
             }
             #endregion
             #region Date & Time
             {
                 string[] var5 = Regex.Split(matchWindow, "33%;\">");
-                result.Ago = Regex.Split(var5[1], "</div>")[0];
-                result.Time = Regex.Split(var5[2], "</div>")[0];
-                result.Time = Regex.Replace(result.Time, "[^0-9:]", "");
+                result.ago = Regex.Split(var5[1], "</div>")[0];
+                result.time = Regex.Split(var5[2], "</div>")[0];
+                result.time = Regex.Replace(result.time, "[^0-9:]", "");
             }
             #endregion
             #region Betting
@@ -258,11 +259,11 @@ namespace Logging_Program
 
                 int tempVar;// Något bug på deras sida vilket gör att typ en gång i hundra så visar den inte amount så behöver TryParse
                 int.TryParse(var5[0], out tempVar);
-                result.AmountOfPeopleBetting = tempVar;
+                result.amountOfPeopleBetting = tempVar;
                 tempVar = 0;//TODO Hade glömt att noll ställa tempVar. Dubble kolla i databasen så det inte finns någon match med People och Items är de samma..
                 //Extremt otroligt att det skulle hända natuligt.
                 int.TryParse(var5[3], out tempVar);
-                result.AmountOfItemsBetted = tempVar;
+                result.amountOfItemsBetted = tempVar;
             }
             #endregion
 
@@ -290,17 +291,14 @@ namespace Logging_Program
             #endregion
             #region comment
             {
-                //FIX
-                //TODO
-                comment = "";
-                //comment = Regex.Split(data, "#D12121\"> ")[1];
-                //comment = Regex.Split(comment, "</span>")[0];
+                comment = Regex.Split(data, "#D12121\">")[1];
+                comment = Regex.Split(comment, "</span>")[0];
             }
             #endregion
 
             UniqueMatch newInfo = grabInfoFromMatchPage(mainLink + "/match?m=" + matchID);
-            newInfo.Tournament = tour;
-            newInfo.Comment = comment;
+            newInfo.tournament = tour;
+            newInfo.comment = comment;
 
             return newInfo;
         }
@@ -326,141 +324,20 @@ namespace Logging_Program
     }
     public class UniqueMatch
     {
-        private string tournament { get; set; }
-        private int matchID { get; set; }
-        private string opp1 { get; set; }
-        private string opp2 { get; set; }
-        private int opp1Procent { get; set; }
-        private int opp2Procent { get; set; }
-        private string comment { get; set; }
-        private int matchCount { get; set; }
-        private string winner { get; set; }
-        private int amountOfPeopleBetting { get; set; }
-        private int amountOfItemsBetted { get; set; }
-        private string ago { get; set; }
-        private string time { get; set; }
-        private DateTime timeWhenDataTaken { get; set; }
-
-
-        public UniqueMatch()
-        {
-        }
-        public UniqueMatch(string data)
-        {
-            string[] individualData = Regex.Split(data, "<--->");
-
-            tournament = individualData[0];
-            matchID = int.Parse(individualData[1]);
-            opp1 = individualData[2];
-            opp2 = individualData[3];
-            opp1Procent = int.Parse(individualData[4]);
-            opp2Procent = int.Parse(individualData[5]);
-            comment = individualData[6];
-            matchCount = int.Parse(individualData[7]);
-            winner = individualData[8];
-            amountOfPeopleBetting = int.Parse(individualData[9]);
-            amountOfItemsBetted = int.Parse(individualData[10]);
-            ago = individualData[11];
-            time = individualData[12];
-            timeWhenDataTaken = DateTime.Parse(individualData[13]);
-        }
-
-        public string Tournament
-        {
-            get { return tournament; }
-            set { tournament = value; }
-        }
-        public int MatchID
-        {
-            get { return matchID; }
-            set { matchID = value; }
-        }
-        public string Opp1
-        {
-            get { return opp1; }
-            set { opp1 = value; }
-        }
-        public string Opp2
-        {
-            get { return opp2; }
-            set { opp2 = value; }
-        }
-        public int Opp1Procent
-        {
-            get { return opp1Procent; }
-            set { opp1Procent = value; }
-        }
-        public int Opp2Procent
-        {
-            get { return opp2Procent; }
-            set { opp2Procent = value; }
-        }
-        public string Comment
-        {
-            get { return comment; }
-            set { comment = value; }
-        }
-        public int MatchCount
-        {
-            get { return matchCount; }
-            set { matchCount = value; }
-        }
-        public string Winner
-        {
-            get { return winner; }
-            set { winner = value; }
-        }
-        public int AmountOfPeopleBetting
-        {
-            get { return amountOfPeopleBetting; }
-            set { amountOfPeopleBetting = value; }
-        }
-        public int AmountOfItemsBetted
-        {
-            get { return amountOfItemsBetted; }
-            set { amountOfItemsBetted = value; }
-        }
-        public string Ago
-        {
-            get { return ago; }
-            set { ago = value; }
-        }
-        public string Time
-        {
-            get { return time; }
-            set { time = value; }
-        }
-        public DateTime TimeWhenDataTaken
-        {
-            get { return timeWhenDataTaken; }
-            set { timeWhenDataTaken = value; }
-        }
-
-
-
-        public void SaveToLoc(string loc)
-        {
-            StringBuilder builder = new StringBuilder();
-            builder.Append(tournament + "<--->");
-            builder.Append(matchID + "<--->");
-            builder.Append(opp1 + "<--->");
-            builder.Append(opp2 + "<--->");
-            builder.Append(opp1Procent + "<--->");
-            builder.Append(opp2Procent + "<--->");
-            builder.Append(comment + "<--->");
-            builder.Append(matchCount + "<--->");
-            builder.Append(winner + "<--->");
-            builder.Append(amountOfPeopleBetting + "<--->");
-            builder.Append(amountOfItemsBetted + "<--->");
-            builder.Append(ago + "<--->");
-            builder.Append(time + "<--->");
-            builder.Append(timeWhenDataTaken.ToString());
-
-            using (StreamWriter writer = new StreamWriter(Path.Combine(loc, matchID + ".txt"), true))
-            {
-                writer.WriteLine(builder.ToString());
-            }
-        }
+        public string tournament { get; set; }
+        public int matchID { get; set; }
+        public string opp1 { get; set; }
+        public string opp2 { get; set; }
+        public int opp1Procent { get; set; }
+        public int opp2Procent { get; set; }
+        public string comment { get; set; }
+        public int matchCount { get; set; }
+        public string winner { get; set; }
+        public int amountOfPeopleBetting { get; set; }
+        public int amountOfItemsBetted { get; set; }
+        public string ago { get; set; }
+        public string time { get; set; }
+        public DateTime timeWhenDataTaken { get; set; }
     }
     
     public class Logger
