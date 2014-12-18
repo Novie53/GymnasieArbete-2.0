@@ -15,9 +15,9 @@ namespace Logging_Program
     {
         public const int ConnectionTries = 1000;
         public const int FailedToConnecetSleep = 10000;
-        public const string version = "0.7.3";
+        public const string version = "0.8.0";
         public const string logPath = @"C:\Users\Novie\Desktop\GymLog";
-        public const string databasePATH = @"C:\Users\Novie\Desktop\GymnaArbete\mainDatabase.db";
+        public const string databasePATH = @"C:\Users\Novie\Desktop\GymnaArbete\NewTest\Main.db";
     }
     public class DatabaseConncter : IDisposable
     {
@@ -70,6 +70,7 @@ namespace Logging_Program
         public void Flush()
         {
             ExecuteNonQuery(true, flushedSQLCommands.ToString());
+            flushedSQLCommands.Clear();
         }
         public DataTable ExecuteQuery(string SQL)
         {
@@ -99,7 +100,12 @@ namespace Logging_Program
         public bool AutoFlush
         {
             get { return autoFlush; }
-            set { autoFlush = value; }
+            set
+            {
+                autoFlush = value;
+                if (autoFlush)
+                    Flush();
+            }
         }
         public void Dispose()
         {
@@ -201,24 +207,31 @@ namespace Logging_Program
                 result.MatchID = int.Parse(matchLink.Split('=')[1]);
             }
             #endregion
-            #region Opponents
+            #region Opponents & Winner
             {
                 string[] splits = Regex.Split(matchWindow, @"</b><br><i>");
 
                 var matches = Regex.Matches(splits[0], "<b>");
                 result.Opp1 = splits[0].Substring(matches[matches.Count - 1].Index + matches[matches.Count - 1].Length);
                 if (result.Opp1.Contains("(win)"))
+                {
                     result.Opp1 = result.Opp1.Remove(5);
-                result.Opp1 = Regex.Replace(result.Opp1, @"[^a-zA-Z]", "");
-
+                    result.Winner = result.Opp1;
+                }
+                
                 matches = Regex.Matches(splits[1], "<b>");
                 result.Opp2 = splits[1].Substring(matches[matches.Count - 1].Index + matches[matches.Count - 1].Length);
                 if (result.Opp2.Contains("(win)"))
+                {
                     result.Opp2 = result.Opp2.Remove(5);
-                result.Opp2 = Regex.Replace(result.Opp2, @"[^a-zA-Z]", "");
+                    result.Winner = result.Opp2;
+                }
 
                 result.Opp1Procent = int.Parse(Regex.Split(splits[1], @"%</i>")[0]);
                 result.Opp2Procent = int.Parse(Regex.Split(splits[2], @"%</i>")[0]);
+                result.Opp1 = Regex.Replace(result.Opp1, @"[^a-zA-Z0-9 ]", "").ToLower();
+                result.Opp2 = Regex.Replace(result.Opp1, @"[^a-zA-Z0-9 ]", "").ToLower();
+                result.Winner = Regex.Replace(result.Winner, @"[^a-zA-Z0-9 ]", "").ToLower();
             }
             #endregion
             #region antalMatcher
@@ -230,22 +243,6 @@ namespace Logging_Program
                     result.MatchCount = int.Parse(rawData);
             }
             #endregion
-            #region Winner
-            {
-                if (Regex.IsMatch(matchWindow, @"\(win\)"))
-                {
-                    string tempString = matchWindow.Remove(Regex.Match(matchWindow, @"\(win\)").Index);
-                    var patternMatches = Regex.Matches(tempString, "<b>");
-                    tempString = tempString.Substring(patternMatches[patternMatches.Count - 1].Index + patternMatches[patternMatches.Count - 1].Length).Trim();
-
-                    if (tempString == result.Opp1)
-                        result.Winner = result.Opp1;
-                    else
-                        result.Winner = result.Opp2;
-                    result.Winner = Regex.Replace(result.Winner, @"[^a-zA-Z]", "");
-                }
-            }
-            #endregion
             #region Date & Time
             {
                 string[] var5 = Regex.Split(matchWindow, "33%;\">");
@@ -255,18 +252,15 @@ namespace Logging_Program
             }
             #endregion
             #region Betting
-            {
-                //string var6 = Regex.Split(matchWindow, "full\">")[2];
-                //var6 = Regex.Split(var6, "</div>")[0];
-                //var6 = var6.Trim();
-                //string[] var5 = var6.Split(' ');
-                
+            {                
                 string[] var5 = Regex.Split(Regex.Split(matchWindow, "full\">")[2], "</div>")[0].Trim().Split(' ');
 
 
                 int tempVar;// Något bug på deras sida vilket gör att typ en gång i hundra så visar den inte amount så behöver TryParse
                 int.TryParse(var5[0], out tempVar);
                 result.AmountOfPeopleBetting = tempVar;
+                tempVar = 0;//TODO Hade glömt att noll ställa tempVar. Dubble kolla i databasen så det inte finns någon match med People och Items är de samma..
+                //Extremt otroligt att det skulle hända natuligt.
                 int.TryParse(var5[3], out tempVar);
                 result.AmountOfItemsBetted = tempVar;
             }
@@ -284,7 +278,7 @@ namespace Logging_Program
             {
                 tour = Regex.Split(data, "eventm\">")[1];
                 tour = Regex.Split(tour, "</div>")[0];
-                tour = tour.Trim();
+                tour = Regex.Replace(tour.Trim(), @"[^a-zA-Z0-9 ]", "").ToLower();
             }
             #endregion
             #region matchID
@@ -310,7 +304,7 @@ namespace Logging_Program
 
             return newInfo;
         }
-        public static List<UniqueMatch> grabInfoFromWeb(string mainLink)
+        public static List<UniqueMatch> MainGather(string mainLink)
         {
             List<UniqueMatch> list = new List<UniqueMatch>();
             string mainPageData = getHTML(mainLink);

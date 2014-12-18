@@ -84,41 +84,39 @@ namespace Logging_Program
     
     public class Worker : IDisposable
     {
+        private DataTable name_table;
         private int dotaTableCount;
         private string dbConString;
-        System.Threading.Timer timer;
+        private DatabaseConncter dbConnector;
+        private System.Threading.Timer timer;
+
 
         public Worker()
         {
             dbConString = @"Data Source=" + Config.databasePATH + @";Version=3;";
-            using (DatabaseConncter dbConnector = new DatabaseConncter(dbConString))
-            {
-                dotaTableCount = dbConnector.getTableCount("dota_matches");
-            }
-            timer = new System.Threading.Timer(herpLeDerp, null, 5000, Timeout.Infinite);
+            dbConnector = new DatabaseConncter(dbConString);
+            dotaTableCount = dbConnector.getTableCount("dota_matches");
+            name_table = dbConnector.ExecuteQuery("SELECT * FROM name_table");
+            timer = new System.Threading.Timer(TimerTick, null, 5000, Timeout.Infinite);
+        }
+        public void Dispose()
+        {
+            dbConnector.Dispose();
+            timer.Dispose();
         }
 
-        public void herpLeDerp(object state)
+
+        public void TimerTick(object state)
         {
             // WORK
             MainFunc(@"http://dota2lounge.com/");
 
             timer.Change(300000, Timeout.Infinite);//5 min
         }
-
-
-        public void Dispose()
-        {
-            timer.Dispose();
-        }
-        private int DateTimeToUnixTimestamp(DateTime dateTime)
-        {
-            return (int)(dateTime - new DateTime(1970, 1, 1).ToLocalTime()).TotalSeconds;
-        }
         private void MainFunc(string path)
         {
             Dictionary<string, string> data;
-            foreach (var item in GatherData.grabInfoFromWeb(path))
+            foreach (var item in GatherData.MainGather(path))
             {
                 data = new Dictionary<string, string>();
                 data.Add("id", dotaTableCount.ToString());
@@ -130,29 +128,39 @@ namespace Logging_Program
                 data.Add("items_betting", item.AmountOfItemsBetted.ToString());
                 data.Add("when_taken", DateTimeToUnixTimestamp(item.TimeWhenDataTaken).ToString());
 
-                if (item.Tournament != "")
-                    data.Add("tournament", "'" + item.Tournament + "'");
-                if (item.Opp1 != "")
-                    data.Add("opponent1", "'" + item.Opp1 + "'");
-                if (item.Opp2 != "")
-                    data.Add("opponent2", "'" + item.Opp2 + "'");
-                if (item.Comment != "")
-                    data.Add("comment", "'" + item.Comment + "'");
-                if (item.Winner != "" && item.Winner != null)//TODO Dubbelkolla så denna är som den ska
-                    data.Add("winner", "'" + item.Winner + "'");
-                if (item.Ago != "")
-                    data.Add("ago", "'" + item.Ago + "'");
-                if (item.Time != "")
-                    data.Add("time", "'" + item.Time + "'");
+                data.Add("comment", item.Comment);
+                data.Add("ago", item.Ago);
+                data.Add("time", item.Time);
 
-                item.SaveToLoc(@"D:\DotaData\");
+                data.Add("tournament", findName(item.Tournament).ToString());
+                data.Add("opponent1", findName(item.Opp1).ToString());
+                data.Add("opponent2", findName(item.Opp2).ToString());
+                data.Add("winner", findName(item.Winner).ToString());
+
+
                 InsertToDatabase("dota_matches", data);
                 dotaTableCount++;
             }
         }
+
+        public int findName(string name)
+        {
+            foreach (DataRow row in name_table.Rows)
+            {
+                if (name == row.ItemArray[1].ToString())
+                    return Convert.ToInt32(row.ItemArray[0]);
+            }
+            name_table.Rows.Add(name_table.Rows.Count, name);
+            InsertToDatabase("name_table", new Dictionary<string, string>() { { "id", (name_table.Rows.Count - 1).ToString() }, { "name", name } });
+            return (name_table.Rows.Count - 1);
+        }
+        private int DateTimeToUnixTimestamp(DateTime dateTime)
+        {
+            return (int)(dateTime - new DateTime(1970, 1, 1).ToLocalTime()).TotalSeconds;
+        }
         private void InsertToDatabase(string tableName, Dictionary<string, string> data)
         {
-            string var1 = "INSERT INTO " + tableName + " (";
+            string var1 = "INSERT INTO " + tableName + "(";
             for (int i = 0; i < data.Count; i++)
             {
                 if (i == data.Count - 1)
@@ -160,20 +168,17 @@ namespace Logging_Program
                 else
                     var1 += data.ElementAt(i).Key + ",";
             }
-            var1 += ") VALUES (";
+            var1 += ")VALUES(";
             for (int i = 0; i < data.Count; i++)
             {
                 if (i == data.Count - 1)
-                    var1 += data.ElementAt(i).Value;
+                    var1 += "'" + data.ElementAt(i).Value + "'";
                 else
-                    var1 += data.ElementAt(i).Value + ",";
+                    var1 += "'" + data.ElementAt(i).Value + "',";
             }
             var1 += ");";
 
-            using (DatabaseConncter dbConnector = new DatabaseConncter(dbConString))
-            {
-                dbConnector.ExecuteNonQuery(var1);
-            }
+            dbConnector.ExecuteNonQuery(var1);
         }
     }
 }
