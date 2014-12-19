@@ -16,9 +16,6 @@
             if (disposing && (components != null))
             {
                 components.Dispose();
-
-                this.oldDBConnector.Dispose();
-                this.newDBConnector.Dispose();
             }
             base.Dispose(disposing);
         }
