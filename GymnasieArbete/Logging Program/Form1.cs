@@ -23,15 +23,16 @@ namespace Logging_Program
 	    *Någon form av timer för att kontinuellt hämta data från internet
         *Lägga in Flush mekanik i databas saken
             *med AutoFlash
-            
-            HögerKlick propties i notifyIcon, typ som Avsluta, och kanske info om programmet håller på att hämta just då
-                Pausa kanske?
-            Konventerar över allt från Text filer till databasen
-	    *Impenter koppling till databas och möjlighet att lagra och hämta information
+        *Impenter koppling till databas och möjlighet att lagra och hämta information
         *Skapa en config plats/class
 	    *Fixa så att alla krashar lagras på ett bra sätt
         *Separat Thread för hämtning så Form Threaded inte fastnar?
-        */
+        
+        
+        HögerKlick propties i notifyIcon, typ som Avsluta, och kanske info om programmet håller på att hämta just då
+            Pausa kanske?
+        Konventerar över allt från Text filer till databasen
+	    */
 
 
 
