@@ -21,20 +21,18 @@ namespace Logging_Program
         /*
         *Ha Programmet i System Tray
 	    *Någon form av timer för att kontinuellt hämta data från internet
-         *  Lägga in Flush mekanik i databas saken
-         *  med AutoFlash
+        *Lägga in Flush mekanik i databas saken
+            *med AutoFlash
+            
             HögerKlick propties i notifyIcon, typ som Avsluta, och kanske info om programmet håller på att hämta just då
-            Pausa kanske?
-	        Impenter koppling till databas och möjlighet att lagra och hämta information
-	        Konventerar över allt från Text filer till databasen
-        *Tydligen är det bättre att skapa en ny databasConnection varje gång istället för att hålla uppe en.
-            Värt att göra om så man skickar all data på en och samma gång istället för att skicka dem en och en?
-                Så istället för att kalla på InsertIntoDataase 10-20 gånger per 5 minuter så blir det 1 gång per 5 min?
+                Pausa kanske?
+            Konventerar över allt från Text filer till databasen
+	    *Impenter koppling till databas och möjlighet att lagra och hämta information
         *Skapa en config plats/class
-	        Fixa så att alla krashar lagras på ett bra sätt
+	    *Fixa så att alla krashar lagras på ett bra sätt
         *Separat Thread för hämtning så Form Threaded inte fastnar?
         */
-        
+
 
 
         public Form1(ref Logger log)
