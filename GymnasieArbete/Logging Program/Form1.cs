@@ -30,32 +30,56 @@ namespace Logging_Program
         
         
         HögerKlick propties i notifyIcon, typ som Avsluta, och kanske info om programmet håller på att hämta just då
-            Pausa kanske?
+            *Pausa kanske?
+            Info
         Konventerar över allt från Text filer till databasen
 	    */
 
-
+        
+        
 
         public Form1(ref Logger log)
         {
             this.log = log;
             worker = new Worker();
             InitializeComponent();
-
-
-            notifyIcon1.Icon = Icon.ExtractAssociatedIcon(@"C:\Program Files (x86)\Mozilla Firefox\firefox.exe");
-            notifyIcon1.DoubleClick += notifyIcon1_DoubleClick;
+            initiNotifyIconSub();
         }
-
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             notifyIcon1.Dispose();
             worker.Dispose();
         }
 
+
         #region NotificationIcon
 
-        private NotifyIcon notifyIcon1 = new NotifyIcon();
+        private MenuItem menuItemPause;
+        private ContextMenu contextMenu1;
+        private MenuItem menuItemClose;
+        private NotifyIcon notifyIcon1;
+
+        private void initiNotifyIconSub()
+        {
+            menuItemPause = new MenuItem();
+            contextMenu1 = new ContextMenu();
+            menuItemClose = new MenuItem();
+            notifyIcon1 = new NotifyIcon();
+
+            contextMenu1.MenuItems.Add(menuItemPause);
+            contextMenu1.MenuItems.Add(menuItemClose);
+
+            menuItemPause.Text = "Pause";
+            menuItemPause.Click += menuItemPause_Click;
+
+            menuItemClose.Text = "Exit";
+            menuItemClose.Click += menuItemClose_Click;
+
+            notifyIcon1.Icon = Icon.ExtractAssociatedIcon(@"C:\Program Files (x86)\Mozilla Firefox\firefox.exe");
+            notifyIcon1.DoubleClick += notifyIcon1_DoubleClick;
+            notifyIcon1.Text = "GymnasieArbete";
+            notifyIcon1.ContextMenu = contextMenu1;
+        }
         private void notifyIcon1_DoubleClick(object sender, EventArgs e)
         {
             this.Show();
@@ -77,6 +101,23 @@ namespace Logging_Program
                 notifyIcon1.Visible = false;
             }
         }
+        private void menuItemClose_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+        private void menuItemPause_Click(object sender, EventArgs e)
+        {
+            if (menuItemPause.Text[0] == 'P')
+            {
+                worker.Running = false;
+                menuItemPause.Text = "Activate";
+            }
+            else if (menuItemPause.Text[0] == 'A')
+            {
+                worker.Running = true;
+                menuItemPause.Text = "Pause";
+            }
+        }
 
         #endregion
     }
@@ -88,8 +129,19 @@ namespace Logging_Program
         private string dbConString;
         private DatabaseConncter dbConnector;
         private System.Threading.Timer timer;
+        private bool active;
 
 
+        public bool Running
+        {
+            get { return active; }
+            set 
+            {
+                if (value)
+                    timer.Change(300000, Timeout.Infinite);
+                active = value; 
+            }
+        }
         public Worker()
         {
             dbConString = @"Data Source=" + Config.databasePATH + @";Version=3;";
@@ -110,7 +162,8 @@ namespace Logging_Program
             // WORK
             MainFunc(@"http://dota2lounge.com/");
 
-            timer.Change(300000, Timeout.Infinite);//5 min
+            if (active)
+                timer.Change(300000, Timeout.Infinite);//5 min
         }
         private void MainFunc(string path)
         {
