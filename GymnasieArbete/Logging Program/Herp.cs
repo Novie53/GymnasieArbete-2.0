@@ -15,9 +15,15 @@ namespace Logging_Program
     {
         public const int ConnectionTries = 1000;
         public const int FailedToConnecetSleep = 10000;
-        public const string version = "0.9.0";
+        public const string version = "0.9.1";
         public const string logPath = @"F:\Data\GymnaArbete\GymLog";
         public const string databasePATH = @"F:\Data\GymnaArbete\DataBase\Main.db";
+
+
+        public static int DateTimeToUnixTimestamp(DateTime dateTime)
+        {
+            return (int)(dateTime - new DateTime(1970, 1, 1).ToLocalTime()).TotalSeconds;
+        }
     }
     public class DatabaseConncter : IDisposable
     {
@@ -209,30 +215,32 @@ namespace Logging_Program
             #endregion
             #region Opponents & Winner
             {
-                result.winner = "";
+                result.winner = 0;
                 string[] splits = Regex.Split(matchWindow, @"</b><br><i>");
 
                 var matches = Regex.Matches(splits[0], "<b>");
                 result.opp1 = splits[0].Substring(matches[matches.Count - 1].Index + matches[matches.Count - 1].Length);
-                if (result.opp1.Contains("(win)"))
+                matches = Regex.Matches(result.opp1, "(win)");
+                if (matches.Count != 0)
                 {
-                    result.opp1 = result.opp1.Remove(5);
-                    result.winner = result.opp1;
+                    result.opp1 = result.opp1.Remove(matches[0].Index - 1).Trim();
+                    result.winner = 1;
                 }
                 
                 matches = Regex.Matches(splits[1], "<b>");
                 result.opp2 = splits[1].Substring(matches[matches.Count - 1].Index + matches[matches.Count - 1].Length);
-                if (result.opp2.Contains("(win)"))
+                matches = Regex.Matches(result.opp2, "(win)");
+                if (matches.Count != 0)
                 {
-                    result.opp2 = result.opp2.Remove(5);
-                    result.winner = result.opp2;
+                    result.opp2 = result.opp2.Remove(matches[0].Index - 1).Trim();
+                    result.winner = 2;
                 }
 
                 result.opp1Procent = int.Parse(Regex.Split(splits[1], @"%</i>")[0]);
                 result.opp2Procent = int.Parse(Regex.Split(splits[2], @"%</i>")[0]);
-                result.opp1 = Regex.Replace(result.opp1, @"[^a-zA-Z0-9 ]", "").ToLower();
-                result.opp2 = Regex.Replace(result.opp1, @"[^a-zA-Z0-9 ]", "").ToLower();
-                result.winner = Regex.Replace(result.winner, @"[^a-zA-Z0-9 ]", "").ToLower();
+                //result.opp1 = Regex.Replace(result.opp1, @"[^a-zA-Z0-9 ]", "");
+                //result.opp2 = Regex.Replace(result.opp1, @"[^a-zA-Z0-9 ]", "");
+                //result.winner = Regex.Replace(result.winner, @"[^a-zA-Z0-9 ]", "");
             }
             #endregion
             #region antalMatcher
@@ -279,7 +287,8 @@ namespace Logging_Program
             {
                 tour = Regex.Split(data, "eventm\">")[1];
                 tour = Regex.Split(tour, "</div>")[0];
-                tour = Regex.Replace(tour.Trim(), @"[^a-zA-Z0-9 ]", "").ToLower();
+                tour = tour.Trim();
+                //tour = Regex.Replace(tour.Trim(), @"[^a-zA-Z0-9 ]", "");
             }
             #endregion
             #region matchID
@@ -292,6 +301,7 @@ namespace Logging_Program
             #region comment
             {
                 comment = Regex.Split(data, "#D12121\">")[1];
+                comment = comment.Substring(3).Trim();
                 comment = Regex.Split(comment, "</span>")[0];
             }
             #endregion
@@ -332,7 +342,7 @@ namespace Logging_Program
         public int opp2Procent { get; set; }
         public string comment { get; set; }
         public int matchCount { get; set; }
-        public string winner { get; set; }
+        public int winner { get; set; }
         public int amountOfPeopleBetting { get; set; }
         public int amountOfItemsBetted { get; set; }
         public string ago { get; set; }

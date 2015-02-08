@@ -129,7 +129,7 @@ namespace Logging_Program
         private string dbConString;
         private DatabaseConncter dbConnector;
         private System.Threading.Timer timer;
-        private bool active;
+        private bool active = true;
 
 
         public bool Running
@@ -154,6 +154,7 @@ namespace Logging_Program
         {
             dbConnector.Dispose();
             timer.Dispose();
+            name_table.Dispose();
         }
 
 
@@ -178,7 +179,8 @@ namespace Logging_Program
                 data.Add("match_count", item.matchCount.ToString());
                 data.Add("people_betting", item.amountOfPeopleBetting.ToString());
                 data.Add("items_betting", item.amountOfItemsBetted.ToString());
-                data.Add("when_taken", DateTimeToUnixTimestamp(item.timeWhenDataTaken).ToString());
+                data.Add("when_taken", Config.DateTimeToUnixTimestamp(item.timeWhenDataTaken).ToString());
+                data.Add("winner", item.winner.ToString());
 
                 data.Add("comment", item.comment);
                 data.Add("ago", item.ago);
@@ -187,8 +189,7 @@ namespace Logging_Program
                 data.Add("tournament", findName(item.tournament).ToString());
                 data.Add("opponent1", findName(item.opp1).ToString());
                 data.Add("opponent2", findName(item.opp2).ToString());
-                data.Add("winner", findName(item.winner).ToString());
-
+                
 
                 InsertToDatabase("dota_matches", data);
                 dotaTableCount++;
@@ -206,10 +207,7 @@ namespace Logging_Program
             InsertToDatabase("name_table", new Dictionary<string, string>() { { "id", (name_table.Rows.Count - 1).ToString() }, { "name", name } });
             return (name_table.Rows.Count - 1);
         }
-        private int DateTimeToUnixTimestamp(DateTime dateTime)
-        {
-            return (int)(dateTime - new DateTime(1970, 1, 1).ToLocalTime()).TotalSeconds;
-        }
+
         private void InsertToDatabase(string tableName, Dictionary<string, string> data)
         {
             string var1 = "INSERT INTO " + tableName + "(";
@@ -224,9 +222,9 @@ namespace Logging_Program
             for (int i = 0; i < data.Count; i++)
             {
                 if (i == data.Count - 1)
-                    var1 += "'" + data.ElementAt(i).Value + "'";
+                    var1 += '"' + data.ElementAt(i).Value + '"';
                 else
-                    var1 += "'" + data.ElementAt(i).Value + "',";
+                    var1 += '"' + data.ElementAt(i).Value + "\",";
             }
             var1 += ");";
 
