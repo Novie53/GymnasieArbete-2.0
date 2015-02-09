@@ -15,7 +15,7 @@ namespace Logging_Program
     {
         public const int ConnectionTries = 1000;
         public const int FailedToConnecetSleep = 10000;
-        public const string version = "0.9.1";
+        public const string version = "0.9.2";
         public const string logPath = @"F:\Data\GymnaArbete\GymLog";
         public const string databasePATH = @"F:\Data\GymnaArbete\DataBase\Main.db";
 
@@ -23,6 +23,10 @@ namespace Logging_Program
         public static int DateTimeToUnixTimestamp(DateTime dateTime)
         {
             return (int)(dateTime - new DateTime(1970, 1, 1).ToLocalTime()).TotalSeconds;
+        }
+        public static DateTime UnixTimeStampToDateTime(int unixTimeStamp)
+        {
+            return new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc).AddSeconds(unixTimeStamp).ToLocalTime();
         }
     }
     public class DatabaseConncter : IDisposable

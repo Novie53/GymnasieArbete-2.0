@@ -177,8 +177,6 @@ namespace Logging_Program
                 data.Add("opponent1_procent", item.opp1Procent.ToString());
                 data.Add("opponent2_procent", item.opp2Procent.ToString());
                 data.Add("match_count", item.matchCount.ToString());
-                data.Add("people_betting", item.amountOfPeopleBetting.ToString());
-                data.Add("items_betting", item.amountOfItemsBetted.ToString());
                 data.Add("when_taken", Config.DateTimeToUnixTimestamp(item.timeWhenDataTaken).ToString());
                 data.Add("winner", item.winner.ToString());
 
